@@ -15,5 +15,6 @@ func Setup(e *echo.Echo) {
 	e.POST("/api/logout", controllers.Logout)
 
 	// book service
-	e.GET("/", controllers.GetUsers)
+
+	// transaction handle
 }
