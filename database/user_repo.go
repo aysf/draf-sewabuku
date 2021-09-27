@@ -2,6 +2,7 @@ package database
 
 import (
 	"gorm.io/gorm"
+	"sewabuku/middlewares"
 	"sewabuku/models"
 )
 
@@ -10,12 +11,9 @@ type (
 		db *gorm.DB
 	}
 	UserModel interface {
-		GetAll() ([]models.User, error)
-		Get(userId int) (models.User, error)
-		Insert(models.User) (models.User, error)
-		Edit(user models.User, userId int) (models.User, error)
-		Delete(userId int) (models.User, error)
+		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
+		GetProfile(userId int) (models.User, error)
 	}
 )
 
@@ -23,26 +21,41 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	return &GormUserModel{db: db}
 }
 
-func (g GormUserModel) GetAll() ([]models.User, error) {
-	panic("implement me")
-}
+func (g GormUserModel) Register(user models.User) (models.User, error) {
+	if err := g.db.Create(&user).Error; err != nil {
+		return user, err
+	}
 
-func (g GormUserModel) Get(userId int) (models.User, error) {
-	panic("implement me")
-}
-
-func (g GormUserModel) Insert(user models.User) (models.User, error) {
-	panic("implement me")
-}
-
-func (g GormUserModel) Edit(user models.User, userId int) (models.User, error) {
-	panic("implement me")
-}
-
-func (g GormUserModel) Delete(userId int) (models.User, error) {
-	panic("implement me")
+	return user, nil
 }
 
 func (g GormUserModel) Login(email, password string) (models.User, error) {
-	panic("implement me")
+	var user models.User
+	var err error
+
+	if err = g.db.Where("email = ? AND password = ?", email, password).First(&user).Error; err != nil {
+		return user, err
+	}
+
+	user.Token, err = middlewares.CreateToken(int(user.ID))
+
+	if err != nil {
+		return user, err
+	}
+
+	if err = g.db.Save(user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (g GormUserModel) GetProfile(userId int) (models.User, error) {
+	var user models.User
+
+	if err := g.db.Find(&user, userId).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
