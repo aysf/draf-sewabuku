@@ -6,11 +6,9 @@ import (
 )
 
 func UserPath(e *echo.Echo, userController *user.Controller) {
-	userGroup := e.Group("/users")
+	e.POST("/users/register", userController.RegisterUserController)
 
-	userGroup.POST("/register", userController.RegisterUserController)
+	e.POST("/users/login", userController.LoginUserController)
 
-	userGroup.POST("/login", userController.LoginUserController)
-
-	userGroup.GET("", userController.GetUserProfileController)
+	e.GET("/users", userController.GetUserProfileController)
 }
