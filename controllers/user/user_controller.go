@@ -4,8 +4,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"os"
 	"sewabuku/models"
 	"sewabuku/util"
+	"strconv"
 
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -25,7 +27,9 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
+	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+
+	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcryptCost)
 
 	user := models.User{
 		Name:     userRequest.Name,
