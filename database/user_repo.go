@@ -15,6 +15,7 @@ type (
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
 		GetProfile(userId int) (models.User, error)
+		UpdatePassword(newPass models.User,userId int) (models.User, error)
 	}
 )
 
@@ -34,7 +35,6 @@ func (g *GormUserModel) Login(email, password string) (models.User, error) {
 	var user models.User
 	var err error
 
-
 	if err = g.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return user, err
 	}
@@ -45,7 +45,7 @@ func (g *GormUserModel) Login(email, password string) (models.User, error) {
 
 	user.Token, _ = middlewares.CreateToken(int(user.ID))
 
-	if err = g.db.Save(user).Error; err != nil {
+	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
 	}
 
@@ -56,6 +56,21 @@ func (g *GormUserModel) GetProfile(userId int) (models.User, error) {
 	var user models.User
 
 	if err := g.db.Find(&user, userId).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (g *GormUserModel) UpdatePassword(newPass models.User, userId int) (models.User, error) {
+	var user models.User
+	var err error
+
+	g.db.First(&user, userId)
+
+	user.Password = newPass.Password
+
+	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
 	}
 

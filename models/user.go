@@ -10,5 +10,5 @@ type User struct {
 	Token     string `json:"token"`
 	AccountID uint
 	Account   Account
-  CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"-"`
 }
