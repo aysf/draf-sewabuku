@@ -59,9 +59,10 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
 	user, err := controller.userModel.GetProfile(userId)
+
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
 }
