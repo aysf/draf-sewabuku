@@ -1,6 +1,7 @@
 package database
 
 import (
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"sewabuku/middlewares"
 	"sewabuku/models"
@@ -21,7 +22,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	return &GormUserModel{db: db}
 }
 
-func (g GormUserModel) Register(user models.User) (models.User, error) {
+func (g *GormUserModel) Register(user models.User) (models.User, error) {
 	if err := g.db.Create(&user).Error; err != nil {
 		return user, err
 	}
@@ -29,19 +30,20 @@ func (g GormUserModel) Register(user models.User) (models.User, error) {
 	return user, nil
 }
 
-func (g GormUserModel) Login(email, password string) (models.User, error) {
+func (g *GormUserModel) Login(email, password string) (models.User, error) {
 	var user models.User
 	var err error
 
-	if err = g.db.Where("email = ? AND password = ?", email, password).First(&user).Error; err != nil {
+
+	if err = g.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return user, err
 	}
 
-	user.Token, err = middlewares.CreateToken(int(user.ID))
-
-	if err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return user, err
 	}
+
+	user.Token, _ = middlewares.CreateToken(int(user.ID))
 
 	if err = g.db.Save(user).Error; err != nil {
 		return user, err
@@ -50,7 +52,7 @@ func (g GormUserModel) Login(email, password string) (models.User, error) {
 	return user, nil
 }
 
-func (g GormUserModel) GetProfile(userId int) (models.User, error) {
+func (g *GormUserModel) GetProfile(userId int) (models.User, error) {
 	var user models.User
 
 	if err := g.db.Find(&user, userId).Error; err != nil {
