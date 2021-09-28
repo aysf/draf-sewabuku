@@ -25,12 +25,12 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	passwordCrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
+	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 
 	user := models.User{
 		Name:     userRequest.Name,
 		Email:    userRequest.Email,
-		Password: string(passwordCrypted),
+		Password: string(passwordEncrypted),
 	}
 
 	_, err := controller.userModel.Register(user)
@@ -44,20 +44,15 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 
 func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
-
-	if err := c.Bind(&userRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+	c.Bind(&userRequest)
 
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", nil))
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"token": user.Token,
-	})
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Succes", "token: "+user.Token))
 }
 
 func (controller *Controller) GetUserProfileController(c echo.Context) error {
