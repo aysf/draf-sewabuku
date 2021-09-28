@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"sewabuku/models"
+	"sewabuku/util"
 
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -20,12 +21,9 @@ func NewController(userModel database.UserModel) *Controller {
 	}
 }
 
-func (controller Controller) RegisterUserController(c echo.Context) error {
+func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
-
-	if err := c.Bind(&userRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+	c.Bind(&userRequest)
 
 	passwordCrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 
@@ -38,13 +36,13 @@ func (controller Controller) RegisterUserController(c echo.Context) error {
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "internal server error")
+		return c.JSON(http.StatusInternalServerError, util.ResponseFail("Register Fail", nil))
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
 }
 
-func (controller Controller) LoginUserController(c echo.Context) error {
+func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 
 	if err := c.Bind(&userRequest); err != nil {
