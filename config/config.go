@@ -47,3 +47,30 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Account{})
 	db.AutoMigrate(&models.Transfers{})
 }
+
+
+
+//-------------------------------------------------------
+//	DB Config for Unit Testing
+//-------------------------------------------------------
+
+func DBConnectTest() *gorm.DB {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	dbUsername := os.Getenv("DB_USERNAME")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	connectionString :=
+		fmt.Sprintf("%s:%s@/dbsewabuku_test?parseTime=true",
+			dbUsername,
+			dbPassword,
+		)
+	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+
+	if err != nil {
+		panic("could not connect database")
+	}
+
+	return db
+}

@@ -17,12 +17,14 @@ type Controller struct {
 	userModel database.UserModel
 }
 
+// NewController is function to initialize new controller
 func NewController(userModel database.UserModel) *Controller {
 	return &Controller{
 		userModel,
 	}
 }
 
+// RegisterUserController is controller for user registration
 func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
@@ -46,6 +48,7 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
 }
 
+// LoginUserController is controller for user login
 func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
@@ -59,6 +62,7 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Succes", "token: "+user.Token))
 }
 
+// GetUserProfileController is controller for user profile
 func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
@@ -71,6 +75,7 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
 }
 
+// UpdatePasswordController is controller for user edit their password
 func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
