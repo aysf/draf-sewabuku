@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"sewabuku/models"
 
@@ -26,10 +27,12 @@ func (controller Controller) RegisterUserController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "fail")
 	}
 
+	passwordCrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
+
 	user := models.User{
 		Name:     userRequest.Name,
 		Email:    userRequest.Email,
-		Password: userRequest.Password,
+		Password: string(passwordCrypted),
 	}
 
 	_, err := controller.userModel.Register(user)
