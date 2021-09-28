@@ -5,6 +5,7 @@ add `.env` file in the root repository, for example:
 ```sh
 DB_USERNAME=username
 DB_PASSWORD=pasword
+DB_NAME=sewabuku
 SECRET_KEY=secret123
 ```
 
