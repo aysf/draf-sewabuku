@@ -87,3 +87,27 @@ func (r *repository) GetBookByID(id uint) (models.BookData, error) {
 
 	return book, nil
 }
+
+func (r *repository) GetByAuthor(name string) ([]models.BookData, error) {
+	var books []models.BookData
+
+	err := r.db.Raw("SELECT * FROM book_data WHERE author = ?", name).Find(&books).Error
+
+	if err != nil {
+		return []models.BookData{}, err
+	}
+
+	return books, nil
+}
+
+func (r *repository) GetByPublisher(name string) ([]models.BookData, error) {
+	var books []models.BookData
+
+	err := r.db.Raw("SELECT * FROM book_data WHERE publisher = ?", name).Find(&books).Error
+
+	if err != nil {
+		return []models.BookData{}, err
+	}
+
+	return books, nil
+}

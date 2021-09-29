@@ -1,0 +1,3 @@
+#!/bin/sh
+go test -v -coverprofile=coverage.out ./controllers/user/...
+go tool cover -func coverage.out

@@ -125,22 +125,20 @@ func (h *ControllerBook) UpdateBook(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	var bookdata models.BookData
-	bookdata.OwnerID = uint(id)
-	bookdata.CategoryID = input.CategoryID
-	bookdata.PublishDate = input.PublishDate
-	bookdata.Title = input.Title
-	bookdata.Author = input.Author
-	bookdata.Publisher = input.Publisher
-	bookdata.PeiceBook = input.Price
+	book.CategoryID = input.CategoryID
+	book.PublishDate = input.PublishDate
+	book.Title = input.Title
+	book.Author = input.Author
+	book.Publisher = input.Publisher
+	book.PeiceBook = input.Price
 
-	err = h.service.InputBook(bookdata)
+	err = h.service.UpdateBook(book)
 	if err != nil {
 		response := util.ResponseFail(err.Error(), nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	response := util.ResponseSuccess("successfully insert book", bookdata)
+	response := util.ResponseSuccess("successfully insert book", book)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -153,4 +151,12 @@ func (h *ControllerBook) UpdateBook(c echo.Context) error {
 // 		response := util.ResponseError("error internal", nil)
 // 		return c.JSON(http.StatusInternalServerError, response)
 // 	}
+// 	id := c.QueryParam("id")
+
+// 	book, err := h.service.GetBookByID(id)
+// 	if err != nil {
+// 		response := util.ResponseError(err.Error(), nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
+
 // }
