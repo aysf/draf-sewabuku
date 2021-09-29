@@ -29,10 +29,6 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Name, Email, or Password cannot Null", nil))
-	}
-
 	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
 
 	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcryptCost)
@@ -46,7 +42,7 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, util.ResponseFail("Register Fail", nil))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))

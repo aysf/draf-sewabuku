@@ -1,11 +1,11 @@
 package database
 
 import (
-	"sewabuku/middlewares"
-	"sewabuku/models"
-
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"sewabuku/middlewares"
+	"sewabuku/models"
 )
 
 type (
@@ -27,6 +27,11 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
+	if user.Name == "" || user.Email == "" || user.Password == "" {
+		err := errors.New("ALL FIELD CANNOT EMPTY")
+		return user, err
+	}
+
 	if err := g.db.Create(&user).Error; err != nil {
 		return user, err
 	}
