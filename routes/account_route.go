@@ -11,6 +11,6 @@ func AccountPath(e *echo.Echo, accountController *account.Controller) {
 
 	accountGroup.GET("", accountController.ShowAccountBalance)
 
-	accountGroup.GET("", accountController.AddEntries)
+	accountGroup.POST("", accountController.AddEntries)
 
 }

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"fmt"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -20,10 +21,12 @@ func NewController(accountModel database.AccountModel) *Controller {
 }
 
 func (controller *Controller) ShowAccountBalance(c echo.Context) error {
+	fmt.Println("cek 1")
 	userId := middlewares.ExtractTokenUserId(c)
-
+	fmt.Println("cek 2")
 	account, err := controller.accountModel.Show(userId)
 	if err != nil {
+		fmt.Println("cek 3")
 		return c.JSON(http.StatusBadRequest, "fail")
 	}
 
