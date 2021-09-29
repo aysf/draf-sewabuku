@@ -4,8 +4,10 @@ import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
+	"strconv"
 )
 
 type (
@@ -31,6 +33,12 @@ func (g *GormUserModel) Register(user models.User) (models.User, error) {
 		err := errors.New("ALL FIELD CANNOT EMPTY")
 		return user, err
 	}
+
+	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+
+	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcryptCost)
+
+	user.Password = string(passwordEncrypted)
 
 	if err := g.db.Create(&user).Error; err != nil {
 		return user, err
