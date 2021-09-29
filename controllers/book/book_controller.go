@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"sewabuku/database"
+	"sewabuku/middlewares"
+	"sewabuku/models"
 	"sewabuku/util"
 
 	"github.com/labstack/echo/v4"
@@ -56,38 +58,42 @@ func (h *ControllerBook) GetByCategory(c echo.Context) error {
 
 }
 
-// func (h *ControllerBook) InsertBook(c echo.Context) error {
-// 	var input models.InputBook
+func (h *ControllerBook) InsertBook(c echo.Context) error {
+	id := middlewares.ExtractTokenUserId(c)
 
-// 	err := c.Bind(&input)
-// 	if err != nil {
-// 		response := util.ResponseError(err.Error(), nil)
-// 		return c.JSON(http.StatusUnprocessableEntity, response)
+	var input models.InputBook
 
-// 	}
+	err := c.Bind(&input)
+	if err != nil {
+		response := util.ResponseError(err.Error(), nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
 
-// 	id := middlewares.ExtractTokenUserId(c)
+	}
 
-// 	var bookdata models.BookData
-// 	bookdata.Title = input.Title
-// 	bookdata.Author = input.Author
-// 	bookdata.Publisher = input.Publisher
+	if input.Price == 0 {
+		response := util.ResponseFail("cannot insert book if not fill up price column", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 
-// 	var book models.Book
-// 	book.Price = input.Price
-// 	book.UserID = uint(id)
+	var bookdata models.BookData
+	bookdata.OwnerID = uint(id)
+	bookdata.CategoryID = input.CategoryID
+	bookdata.PublishDate = input.PublishDate
+	bookdata.Title = input.Title
+	bookdata.Author = input.Author
+	bookdata.Publisher = input.Publisher
+	bookdata.PeiceBook = input.Price
 
-// 	err = h.service.InputBook(bookdata, book)
-// 	if err != nil {
-// 		response := util.ResponseError(err.Error(), nil)
-// 		return c.JSON(http.StatusUnprocessableEntity, response)
+	err = h.service.InputBook(bookdata)
+	if err != nil {
+		response := util.ResponseFail(err.Error(), nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 
-// 	}
+	response := util.ResponseSuccess("successfully insert book", bookdata)
+	return c.JSON(http.StatusOK, response)
 
-// 	response := util.ResponseSuccess("ok", nil)
-// 	return c.JSON(http.StatusOK, response)
-
-// }
+}
 
 func (h *ControllerBook) GetBookByname(c echo.Context) error {
 	name := c.QueryParam("name")

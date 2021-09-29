@@ -15,5 +15,5 @@ func BookPath(e *echo.Echo, bookController *book.ControllerBook) {
 
 	bookGroup.GET("/namebook", bookController.GetBookByname)
 
-	// bookGroup.POST("/insert", bookController.InsertBook)
+	bookGroup.POST("/insert", bookController.InsertBook)
 }
