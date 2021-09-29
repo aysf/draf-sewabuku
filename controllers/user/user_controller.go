@@ -1,16 +1,16 @@
 package user
 
 import (
-	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
+	"sewabuku/database"
+	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
 	"strconv"
 
-	"sewabuku/database"
-	"sewabuku/middlewares"
+	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Controller struct {
@@ -28,6 +28,10 @@ func NewController(userModel database.UserModel) *Controller {
 func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
+
+	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Name, Email, or Password cannot Null", nil))
+	}
 
 	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
 

@@ -1,10 +1,11 @@
 package database
 
 import (
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"sewabuku/middlewares"
 	"sewabuku/models"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type (

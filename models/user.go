@@ -8,7 +8,7 @@ type User struct {
 	Email     string `json:"email" form:"email" gorm:"unique"`
 	Password  string `json:"-" form:"password"`
 	Token     string `json:"token"`
-	AccountID uint
-	Account   Account
+	//AccountID uint
+	//Account   Account
 	CreatedAt time.Time `json:"-"`
 }

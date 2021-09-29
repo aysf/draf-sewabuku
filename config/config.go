@@ -18,7 +18,8 @@ func DBConnect() *gorm.DB {
 	}
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	//dbName := os.Getenv("DB_NAME")
+	dbName := "ini_test"
 	connectionString :=
 		fmt.Sprintf("%s:%s@/%s?parseTime=true",
 			dbUsername,
@@ -55,16 +56,10 @@ func DBMigrate(db *gorm.DB) {
 //-------------------------------------------------------
 
 func DBConnectTest() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	dbUsername := os.Getenv("DB_USERNAME")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	connectionString :=
+		connectionString :=
 		fmt.Sprintf("%s:%s@/dbsewabuku_test?parseTime=true",
-			dbUsername,
-			dbPassword,
+			"tegarap",
+			"t00r!Roo",
 		)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 
