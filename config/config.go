@@ -46,4 +46,5 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Publisher{})
 	db.AutoMigrate(&models.Account{})
 	db.AutoMigrate(&models.Transfers{})
+	db.AutoMigrate(&models.Entry{})
 }

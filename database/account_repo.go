@@ -19,9 +19,12 @@ type (
 
 func NewAccountModel(db *gorm.DB) *GormAccountModel {
 	if err := db.Exec(`
-	CREATE TRIGGER after_entries_insert 
-	AFTER INSERT ON entries FOR EACH ROW 
-	UPDATE accounts SET balance = balance + new.amount`); err != nil {
+	CREATE TRIGGER after_entries_insert
+	AFTER INSERT
+	ON entries FOR EACH ROW
+	UPDATE accounts
+	SET balance = balance + new.amount
+	WHERE id = new.account_id;`); err != nil {
 		fmt.Println("error")
 	}
 	return &GormAccountModel{db: db}

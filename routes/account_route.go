@@ -1,16 +1,19 @@
 package routes
 
 import (
+	"os"
 	"sewabuku/controllers/account"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func AccountPath(e *echo.Echo, accountController *account.Controller) {
-	accountGroup := e.Group("/account")
+	jwtAuth := e.Group("")
+	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 
-	accountGroup.GET("", accountController.ShowAccountBalance)
+	jwtAuth.GET("/account", accountController.ShowAccountBalance)
 
-	accountGroup.POST("", accountController.AddEntries)
+	jwtAuth.POST("/account", accountController.AddEntries)
 
 }
