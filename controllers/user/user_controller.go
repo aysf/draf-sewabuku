@@ -1,16 +1,12 @@
 package user
 
 import (
+	"github.com/labstack/echo/v4"
 	"net/http"
-	"os"
 	"sewabuku/database"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
-	"strconv"
-
-	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Controller struct {
@@ -29,24 +25,16 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Name, Email, or Password cannot Null", nil))
-	}
-
-	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
-
-	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcryptCost)
-
 	user := models.User{
 		Name:     userRequest.Name,
 		Email:    userRequest.Email,
-		Password: string(passwordEncrypted),
+		Password: userRequest.Password,
 	}
 
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, util.ResponseFail("Register Fail", nil))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
@@ -60,10 +48,10 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", nil))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Succes", "token: "+user.Token))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", "token: "+user.Token))
 }
 
 // GetUserProfileController is controller for user profile

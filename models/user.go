@@ -4,9 +4,9 @@ import "time"
 
 type User struct {
 	ID        uint   `gorm:"primaryKey" json:"id"`
-	Name      string `json:"name" form:"name"`
-	Email     string `json:"email" form:"email" gorm:"unique"`
-	Password  string `json:"-" form:"password"`
+	Name      string `json:"name" form:"name" gorm:"not null"`
+	Email     string `json:"email" form:"email" gorm:"unique;not null"`
+	Password  string `json:"-" form:"password" gorm:"not null"`
 	Token     string `json:"token"`
 	//AccountID uint
 	//Account   Account
