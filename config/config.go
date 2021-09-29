@@ -12,7 +12,7 @@ import (
 )
 
 func DBConnect() *gorm.DB {
-	err := godotenv.Load()
+	err := godotenv.Load("touch.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -39,11 +39,8 @@ func DBConnect() *gorm.DB {
 func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Cart{})
-	db.AutoMigrate(&models.Book{})
 	db.AutoMigrate(&models.BookData{})
-	db.AutoMigrate(&models.Author{})
 	db.AutoMigrate(&models.Catagory{})
-	db.AutoMigrate(&models.Publisher{})
 	db.AutoMigrate(&models.Account{})
 	db.AutoMigrate(&models.Transfers{})
 }

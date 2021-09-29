@@ -20,11 +20,11 @@ func main() {
 
 	// Initialize model
 	userModel := database.NewUserModel(db)
-	bookModel := database.NewBookModel(db)
+	bookModel := database.NewBookRepostory(db)
 
 	// Initialize controller
 	newUserController := user.NewController(userModel)
-	newBookController := book.NewController(bookModel)
+	newBookController := book.NewBookController(bookModel)
 
 	// API path and controller
 	routes.UserPath(e, newUserController)

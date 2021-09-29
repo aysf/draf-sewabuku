@@ -16,7 +16,7 @@ type (
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
 		GetProfile(userId int) (models.User, error)
-		UpdatePassword(newPass models.User,userId int) (models.User, error)
+		UpdatePassword(newPass models.User, userId int) (models.User, error)
 	}
 )
 

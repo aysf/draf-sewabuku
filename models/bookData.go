@@ -4,27 +4,25 @@ import "time"
 
 type BookData struct {
 	ID            uint `gorm:"primaryKey"`
+	OwnerID       uint
 	Title         string
-	AuthorID      uint
-	PublisherID   uint
 	CategoryID    uint
 	PublisherDate time.Time
-	Author        Author
-	Publisher     Publisher
-	Category      Catagory
+	Author        string
+	Publisher     string
+	PublishDate   time.Time
+	FileName      string
+	PeiceBook     uint
 }
-
-type Publisher struct {
-	ID   uint `gorm:"primaryKey"`
-	Name string
-}
-
-type Author struct {
-	ID   uint `gorm:"primaryKey"`
-	Name string
-}
-
 type Catagory struct {
 	ID   uint `gorm:"primaryKey"`
 	Name string
+}
+
+type InputBook struct {
+	Title      string
+	CategoryID uint
+	Author     string
+	Publisher  string
+	Price      uint16
 }
