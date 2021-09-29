@@ -18,8 +18,7 @@ func DBConnect() *gorm.DB {
 	}
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	//dbName := os.Getenv("DB_NAME")
-	dbName := "ini_test"
+	dbName := os.Getenv("DB_NAME")
 	connectionString :=
 		fmt.Sprintf("%s:%s@/%s?parseTime=true",
 			dbUsername,
