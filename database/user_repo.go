@@ -1,9 +1,11 @@
 package database
 
 import (
-	"gorm.io/gorm"
+	"fmt"
 	"sewabuku/middlewares"
 	"sewabuku/models"
+
+	"gorm.io/gorm"
 )
 
 type (
@@ -18,6 +20,13 @@ type (
 )
 
 func NewUserModel(db *gorm.DB) *GormUserModel {
+	if err := db.Exec(`
+	CREATE TRIGGER after_create_user
+	AFTER INSERT ON users FOR EACH ROW 
+	INSERT INTO accounts(balance, user_id)
+	VALUES (0, new.id)`); err != nil {
+		fmt.Println("error")
+	}
 	return &GormUserModel{db: db}
 }
 

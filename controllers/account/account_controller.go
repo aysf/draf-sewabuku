@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
+	"sewabuku/models"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,5 +27,25 @@ func (controller *Controller) ShowAccountBalance(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "fail")
 	}
 
-	return c.JSON(http.StatusOK, account)
+	return c.JSON(http.StatusOK, account.Balance)
+}
+
+func (controller *Controller) AddEntries(c echo.Context) error {
+	var entryRequest models.Entry
+
+	if err := c.Bind(&entryRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, "fail")
+	}
+
+	entry := models.Entry{
+		Amount: entryRequest.Amount,
+	}
+
+	_, err := controller.accountModel.Add(entry)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "internal server error")
+	}
+
+	return c.JSON(http.StatusOK, "success")
 }

@@ -1,19 +1,16 @@
 package routes
 
 import (
-	"sewabuku/controllers/book"
+	"sewabuku/controllers/account"
 
 	"github.com/labstack/echo/v4"
 )
 
-func AccountPath(e *echo.Echo, bookController *book.Controller) {
-	bookGroup := e.Group("/books")
+func AccountPath(e *echo.Echo, accountController *account.Controller) {
+	accountGroup := e.Group("/account")
 
-	bookGroup.GET("", bookController.GetAllBookController)
+	accountGroup.GET("", accountController.ShowAccountBalance)
 
-	bookGroup.GET("/:id", bookController.GetBookController)
+	accountGroup.GET("", accountController.AddEntries)
 
-	//bookGroup.PUT("/:id", bookController.EditBookController)
-
-	//bookGroup.DELETE("/:id", bookController.DeleteBookController)
 }
