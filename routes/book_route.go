@@ -1,18 +1,19 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"sewabuku/controllers/book"
+
+	"github.com/labstack/echo/v4"
 )
 
-func BookPath(e *echo.Echo, bookController *book.Controller) {
+func BookPath(e *echo.Echo, bookController *book.ControllerBook) {
 	bookGroup := e.Group("/books")
 
-	bookGroup.GET("", bookController.GetAllBookController)
+	// bookGroup.GET("", bookController.GetAllBookController)
 
-	bookGroup.GET("/:id", bookController.GetBookController)
+	bookGroup.GET("/bycategory", bookController.GetByCategory)
 
-	//bookGroup.PUT("/:id", bookController.EditBookController)
+	bookGroup.GET("/namebook", bookController.GetBookByname)
 
-	//bookGroup.DELETE("/:id", bookController.DeleteBookController)
+	// bookGroup.POST("/insert", bookController.InsertBook)
 }
