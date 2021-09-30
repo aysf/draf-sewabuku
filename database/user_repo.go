@@ -1,6 +1,13 @@
 package database
 
 import (
+<<<<<<< HEAD
+	"sewabuku/middlewares"
+	"sewabuku/models"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+=======
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -8,6 +15,7 @@ import (
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
+>>>>>>> 162fabe65615ad0dcbb4468ed551a5c7ed315a4f
 )
 
 type (
@@ -18,12 +26,17 @@ type (
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
 		GetProfile(userId int) (models.User, error)
-		UpdatePassword(newPass models.User,userId int) (models.User, error)
+		UpdatePassword(newPass models.User, userId int) (models.User, error)
 	}
 )
 
 // NewUserModel is function to initialize new user model
 func NewUserModel(db *gorm.DB) *GormUserModel {
+	db.Exec(`
+	CREATE TRIGGER after_create_user
+	AFTER INSERT ON users FOR EACH ROW 
+	INSERT INTO accounts(balance, user_id)
+	VALUES (0, new.id);`)
 	return &GormUserModel{db: db}
 }
 

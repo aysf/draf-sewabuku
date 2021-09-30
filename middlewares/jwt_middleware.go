@@ -1,9 +1,10 @@
 package middlewares
 
 import (
+	"os"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"os"
 )
 
 func CreateToken(userId int) (string, error) {
