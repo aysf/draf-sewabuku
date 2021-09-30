@@ -9,5 +9,4 @@ type Cart struct {
 	DateDue    time.Time
 	DateReturn time.Time
 	User       User
-	Book       Book
 }
