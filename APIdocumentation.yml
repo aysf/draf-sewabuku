@@ -1,0 +1,55 @@
+openapi: '3.0.2'
+info:
+  title: SewaBuku
+  description: Part of Alterra Academy Project
+  termsOfService: http://example.com/terms/
+  contact:
+    name: API Support
+    url: http://www.example.com/support
+    email: support@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: '1.0'
+servers:
+  - url: https://localhost:8080
+tags:
+  - name: user
+    description: User control
+    externalDocs:
+      description: Find out more
+      url: http://sewabuku.id
+  - name: book
+    description: book data management
+  - name: account
+    description: all about deposit transaction
+paths:
+  /account:
+    get:
+      tags:
+        - "account"
+      description: return all transaction history
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - "account"
+      description: make deposit
+      responses:
+        '200':
+          description: OK
+
+  /user:
+    get:
+      tags:
+        - user
+      description: Return user loged in
+      responses:
+        '200':
+          description: get user profile .
+          content:
+            application/json:
+              schema:
+                type: array
+
