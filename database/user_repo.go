@@ -19,6 +19,7 @@ type (
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
 		GetProfile(userId int) (models.User, error)
+		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 	}
 )
@@ -86,14 +87,36 @@ func (g *GormUserModel) GetProfile(userId int) (models.User, error) {
 	return user, nil
 }
 
+// UpdateProfile is  method to edit user profile
+func (g *GormUserModel) UpdateProfile(newProfile models.User, userId int) (models.User, error) {
+	var user models.User
+	var err error
+
+	if err = g.db.First(&user, userId).Error; err != nil {
+		return user, err
+	}
+
+	if err = g.db.Save(&user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
 // UpdatePassword is method to edit user password
 func (g *GormUserModel) UpdatePassword(newPass models.User, userId int) (models.User, error) {
 	var user models.User
 	var err error
 
-	g.db.First(&user, userId)
+	if err = g.db.First(&user, userId).Error; err != nil {
+		return user, err
+	}
 
-	user.Password = newPass.Password
+	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+
+	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(newPass.Password), bcryptCost)
+
+	user.Password = string(passwordEncrypted)
 
 	if err = g.db.Save(&user).Error; err != nil {
 		return user, err

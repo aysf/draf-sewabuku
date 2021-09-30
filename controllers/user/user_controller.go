@@ -55,7 +55,7 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", "token: "+user.Token))
 }
 
-// GetUserProfileController is controller for user profile
+// GetUserProfileController is controller for get user profile
 func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
@@ -66,6 +66,26 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
+}
+
+// UpdateUserProfileController is controller for user edit their profile
+func (controller *Controller) UpdateUserProfileController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+	var userRequest models.User
+	c.Bind(&userRequest)
+
+	user := models.User{
+		Name:     userRequest.Name,
+		Email:    userRequest.Email,
+	}
+
+	newProfile, err := controller.userModel.UpdateProfile(user, userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Update User Profile", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", newProfile))
 }
 
 // UpdatePasswordController is controller for user edit their password
