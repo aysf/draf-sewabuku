@@ -1,22 +1,16 @@
 package routes
 
 import (
-	"os"
-	"sewabuku/controllers/user"
-
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"sewabuku/controllers/user"
 )
 
 func UserPath(e *echo.Echo, userController *user.Controller) {
-	jwtAuth := e.Group("")
-	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
+	userGroup := e.Group("/users")
 
-	e.POST("/users/register", userController.RegisterUserController)
+	userGroup.POST("/register", userController.RegisterUserController)
 
-	e.POST("/users/login", userController.LoginUserController)
+	userGroup.POST("/login", userController.LoginUserController)
 
-	jwtAuth.GET("/users/profile", userController.GetUserProfileController)
-
-	jwtAuth.GET("/users/change-password", userController.UpdatePasswordController)
+	userGroup.GET("", userController.GetUserProfileController)
 }

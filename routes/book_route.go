@@ -1,31 +1,18 @@
 package routes
 
 import (
-	"os"
-	"sewabuku/controllers/book"
-
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"sewabuku/controllers/book"
 )
 
-func BookPath(e *echo.Echo, bookController *book.ControllerBook) {
+func BookPath(e *echo.Echo, bookController *book.Controller) {
 	bookGroup := e.Group("/books")
-	jwtAuth := e.Group("/books")
-	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
-	// bookGroup.GET("", bookController.GetAllBookController)
 
-	bookGroup.GET("/category", bookController.GetByCategory)
+	bookGroup.GET("", bookController.GetAllBookController)
 
-	bookGroup.GET("/name", bookController.GetBookByname)
+	bookGroup.GET("/:id", bookController.GetBookController)
 
-	bookGroup.GET("/author", bookController.GetByAuthor)
+	//bookGroup.PUT("/:id", bookController.EditBookController)
 
-	bookGroup.GET("/publisher", bookController.GetByPublisher)
-
-	jwtAuth.POST("/book", bookController.InsertBook)
-
-	jwtAuth.PUT("/book", bookController.UpdateBook)
-
-	jwtAuth.DELETE("/book", bookController.DeleteBook)
-
+	//bookGroup.DELETE("/:id", bookController.DeleteBookController)
 }
