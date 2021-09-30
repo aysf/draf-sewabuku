@@ -12,18 +12,107 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: '1.0'
 servers:
-  - url: https://localhost:8080
+  - description: Server Sewabuku API
+    url: https://{environment}.sewabuku.id/api/v1
+    variables:
+      environment:
+        default: dev
+        enum:
+          - dev
+          - prod
 tags:
-  - name: user
+  - name: Users
     description: User control
-    externalDocs:
-      description: Find out more
-      url: http://sewabuku.id
-  - name: book
+  - name: Books
     description: book data management
-  - name: account
+  - name: Accounts
     description: all about deposit transaction
 paths:
+  ####################################
+  #  USERS
+  ####################################
+  /users/register:
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsersSchema'
+      responses:
+        '200':
+          $ref: '#/components/responses/registerSuccess'
+        '400':
+          $ref: '#/components/responses/registerFailed'
+  /users/login:
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: bangtegar@gmail.com
+                password:
+                  type: string
+                  example: iniPaswordAing123
+      responses:
+        '200':
+          $ref: '#/components/responses/loginSuccess'
+        '400':
+          $ref: '#/components/responses/loginFailed'
+  /users/profile:
+    get:
+      tags:
+        - Users
+      responses:
+        '200':
+          $ref: '#/components/responses/getUserProfileSuccess'
+        '400':
+          $ref: '#/components/responses/getUserProfileFailed'
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsersSchema'
+      responses:
+        '200':
+          $ref: '#/components/responses/editUserProfileSuccess'
+        '400':
+          $ref: '#/components/responses/editUserPasswordFailed'
+  /users/change-password:
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  example: iniPaswordAing123
+                newPassword:
+                  type: string
+                  example: hesoyam99
+      responses:
+        '200':
+          $ref: '#/components/responses/editUserPasswordSuccess'
+        '400':
+          $ref: '#/components/responses/editUserPasswordFailed'
+
+  ####################################
+  #  ACCOUNTS
+  ####################################
   /account:
     get:
       tags:
@@ -40,16 +129,165 @@ paths:
         '200':
           description: OK
 
-  /user:
-    get:
-      tags:
-        - user
-      description: Return user loged in
-      responses:
-        '200':
-          description: get user profile .
-          content:
-            application/json:
-              schema:
-                type: array
+components:
+  responses:
+    #==================================#
+    #    RESPONSE REGISTER USER
+    #==================================#
+    registerSuccess:
+      description: register success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Register Success
+    registerFailed:
+      description: register failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Register Failed
+    #==================================#
+    #    RESPONSE LOGIN USER
+    #==================================#
+    loginSuccess:
+      description: login success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Login Success
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VySWQiOjExfQ.YQ47sxFkIfbDVyQ5o6ix38w4BYxnNOPG3F5isqkyyv8
+    loginFailed:
+      description: login failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Login Failed
+    #==================================#
+    #    RESPONSE GET USER PROFILE
+    #==================================#
+    getUserProfileSuccess:
+      description: success get user profile
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Get User Profile
+    getUserProfileFailed:
+      description: fail to get user profile
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Get User Profile
+    #==================================#
+    #    RESPONSE EDIT USER PROFILE
+    #==================================#
+    editUserProfileSuccess:
+      description: success change user profile
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Change User Profile
+    editUserProfileFailed:
+      description: fail to change user profile
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Change User Profile
+    #==================================#
+    #    RESPONSE EDIT USER PASSWORD
+    #==================================#
+    editUserPasswordSuccess:
+      description: success change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Change Password
+    editUserPasswordFailed:
+      description: fail to change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Change Password
+
+
+
+
+
+  #----------------------------------#
+  #    SCHEMAS
+  #----------------------------------#
 
