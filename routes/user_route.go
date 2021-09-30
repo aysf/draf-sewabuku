@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"os"
 	"sewabuku/controllers/user"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func UserPath(e *echo.Echo, userController *user.Controller) {

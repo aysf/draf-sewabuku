@@ -1,12 +1,13 @@
 package user
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Controller struct {
