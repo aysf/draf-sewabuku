@@ -1,30 +1,30 @@
 package user
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"sewabuku/models"
-
 	"sewabuku/database"
 	"sewabuku/middlewares"
+	"sewabuku/models"
+	"sewabuku/util"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Controller struct {
 	userModel database.UserModel
 }
 
+// NewController is function to initialize new controller
 func NewController(userModel database.UserModel) *Controller {
 	return &Controller{
 		userModel,
 	}
 }
 
-func (controller Controller) RegisterUserController(c echo.Context) error {
+// RegisterUserController is controller for user registration
+func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
-
-	if err := c.Bind(&userRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+	c.Bind(&userRequest)
 
 	user := models.User{
 		Name:     userRequest.Name,
@@ -35,37 +35,49 @@ func (controller Controller) RegisterUserController(c echo.Context) error {
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "internal server error")
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
 }
 
-func (controller Controller) LoginUserController(c echo.Context) error {
+// LoginUserController is controller for user login
+func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
-
-	if err := c.Bind(&userRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+	c.Bind(&userRequest)
 
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"token": user.Token,
-	})
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", "token: "+user.Token))
 }
 
+// GetUserProfileController is controller for user profile
 func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
 	user, err := controller.userModel.GetProfile(userId)
+
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
+}
+
+// UpdatePasswordController is controller for user edit their password
+func (controller *Controller) UpdatePasswordController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	var userRequest models.User
+	c.Bind(&userRequest)
+
+	if _, err := controller.userModel.UpdatePassword(userRequest, userId); err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Change Password", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Change Password", nil))
 }

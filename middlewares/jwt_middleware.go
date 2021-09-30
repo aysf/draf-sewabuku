@@ -1,9 +1,10 @@
 package middlewares
 
 import (
+	"os"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-	"os"
 )
 
 func CreateToken(userId int) (string, error) {
@@ -12,7 +13,7 @@ func CreateToken(userId int) (string, error) {
 	claims["userId"] = userId
 	//claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(os.Getenv("SECRET_JWT")))
+	return token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 }
 
 func ExtractTokenUserId(e echo.Context) int {
