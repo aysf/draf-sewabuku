@@ -47,8 +47,6 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Entry{})
 }
 
-
-
 //-------------------------------------------------------
 //	DB Config for Unit Testing
 //-------------------------------------------------------
@@ -65,7 +63,7 @@ func DBConnectTest() *gorm.DB {
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbNameTest := os.Getenv("DB_NAME_TEST")
-		connectionString :=
+	connectionString :=
 		fmt.Sprintf("%s:%s@/%s?parseTime=true",
 			dbUsername,
 			dbPassword,

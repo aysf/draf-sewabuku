@@ -20,15 +20,13 @@ func main() {
 	e := echo.New()
 
 	// Initialize model
+	bookModel := database.NewBookRepostory(db)
 	userModel := database.NewUserModel(db)
 	accountModel := database.NewAccountModel(db)
 
 	// Initialize controller
 	newUserController := user.NewController(userModel)
 	newAccountController := account.NewController(accountModel)
-	bookModel := database.NewBookRepostory(db)
-
-	// Initialize controller
 	newBookController := book.NewBookController(bookModel)
 
 	// API path and controller
