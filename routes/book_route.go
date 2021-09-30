@@ -14,11 +14,18 @@ func BookPath(e *echo.Echo, bookController *book.ControllerBook) {
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 	// bookGroup.GET("", bookController.GetAllBookController)
 
-	bookGroup.GET("/bycategory", bookController.GetByCategory)
+	bookGroup.GET("/category", bookController.GetByCategory)
 
-	bookGroup.GET("/namebook", bookController.GetBookByname)
+	bookGroup.GET("/name", bookController.GetBookByname)
 
-	jwtAuth.POST("/insert", bookController.InsertBook)
+	bookGroup.GET("/author", bookController.GetByAuthor)
 
-	jwtAuth.PUT("/updatebook", bookController.UpdateBook)
+	bookGroup.GET("/publisher", bookController.GetByPublisher)
+
+	jwtAuth.POST("/book", bookController.InsertBook)
+
+	jwtAuth.PUT("/book", bookController.UpdateBook)
+
+	jwtAuth.DELETE("/book", bookController.DeleteBook)
+
 }

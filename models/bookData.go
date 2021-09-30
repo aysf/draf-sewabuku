@@ -3,7 +3,7 @@ package models
 import "time"
 
 type BookData struct {
-	ID            uint      `gorm:"primaryKey" json:"id"`
+	ID            uint      `json:"id" gorm:"primaryKey"`
 	OwnerID       uint      `json:"user_id"`
 	Title         string    `json:"title"`
 	CategoryID    uint      `json:"category_id"`
