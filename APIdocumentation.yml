@@ -438,7 +438,7 @@ components:
     #    RESPONSE GET ALL BOOK
     #==================================#
     getAllBookSuccess:
-      description: success change password
+      description: success get all book
       content:
         application/json:
           schema:
@@ -449,9 +449,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Change Password
+                example: Success Get All Book
     getAllBookFailed:
-      description: fail to change password
+      description: fail to get all book
       content:
         application/json:
           schema:
@@ -462,12 +462,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Change Password
+                example: Fail to Get All Book
     #==================================#
     #    RESPONSE UPDATE BOOK
     #==================================#
     updateBookSuccess:
-      description: success insert book
+      description: success update book
       content:
         application/json:
           schema:
@@ -478,7 +478,7 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Insert Book
+                example: Success Update Book
     updateBookFailed:
       description: fail to insert book
       content:
@@ -491,12 +491,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Insert Book
+                example: Fail to Update Book
     #==================================#
     #    RESPONSE DELETE BOOK
     #==================================#
     deleteBookSuccess:
-      description: success change password
+      description: success delete book
       content:
         application/json:
           schema:
@@ -507,9 +507,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Change Password
+                example: Success Delete Book
     deleteBookFailed:
-      description: fail to change password
+      description: fail to delete book
       content:
         application/json:
           schema:
@@ -520,12 +520,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Change Password
+                example: Fail to Delete Book
     #==================================#
     #    RESPONSE GET BOOK BY CATEGORY
     #==================================#
     getBookByCategorySuccess:
-      description: success insert book
+      description: success get book by category
       content:
         application/json:
           schema:
@@ -536,9 +536,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Insert Book
+                example: Success Get Book By Category
     getBookByCategoryFailed:
-      description: fail to insert book
+      description: fail to get book by category
       content:
         application/json:
           schema:
@@ -549,12 +549,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Insert Book
+                example: Fail to Get Book By Category
     #==================================#
     #    RESPONSE GET BOOK BY TITLE
     #==================================#
     getBookByTitleSuccess:
-      description: success insert book
+      description: success get book by title
       content:
         application/json:
           schema:
@@ -565,9 +565,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Insert Book
+                example: Success Get Book By Title
     getBookByTitleFailed:
-      description: fail to insert book
+      description: fail to get book by title
       content:
         application/json:
           schema:
@@ -578,12 +578,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Insert Book
+                example: Fail to Get Book By Title
     #==================================#
     #    RESPONSE GET BOOK BY AUTHOR
     #==================================#
     getBookByAuthorSuccess:
-      description: success insert book
+      description: success get book by author
       content:
         application/json:
           schema:
@@ -594,9 +594,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Insert Book
+                example: Success Get Book By Author
     getBookByAuthorFailed:
-      description: fail to insert book
+      description: fail to get book by author
       content:
         application/json:
           schema:
@@ -607,12 +607,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Insert Book
+                example: Fail to Get Book By Author
     #==================================#
     #    RESPONSE GET BOOK BY PUBLISHER
     #==================================#
     getBookByPublisherSuccess:
-      description: success insert book
+      description: success get book by publisher
       content:
         application/json:
           schema:
@@ -623,9 +623,9 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Insert Book
+                example: Success Get Book By Publiser
     getBookByPublisherFailed:
-      description: fail to insert book
+      description: fail to get book by publisher
       content:
         application/json:
           schema:
@@ -636,7 +636,7 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Insert Book
+                example: Fail to Get Book By Publisher
 
 
 
