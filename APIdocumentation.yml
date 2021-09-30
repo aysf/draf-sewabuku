@@ -40,7 +40,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsersSchema'
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Tegar Aditia
+                email:
+                  type: string
+                  example: bangtegar@gmail.com
+                password:
+                  type: string
+                  example: iniPaswordAing123
       responses:
         '200':
           $ref: '#/components/responses/registerSuccess'
@@ -72,6 +82,7 @@ paths:
     get:
       tags:
         - Users
+      description: Get user profile
       responses:
         '200':
           $ref: '#/components/responses/getUserProfileSuccess'
@@ -80,20 +91,29 @@ paths:
     post:
       tags:
         - Users
+      description: Edit user profile
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsersSchema'
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Bang Tegar
+                email:
+                  type: string
+                  example: tegarap@gmail.com
       responses:
         '200':
           $ref: '#/components/responses/editUserProfileSuccess'
         '400':
-          $ref: '#/components/responses/editUserPasswordFailed'
+          $ref: '#/components/responses/editUserProfileFailed'
   /users/change-password:
     post:
       tags:
         - Users
+      description: Edit user password
       requestBody:
         content:
           application/json:
@@ -125,42 +145,89 @@ paths:
             schema:
               type: object
               properties:
-                #ini body request book
+              #ini body request book
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/insertBookSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/insertBookFailed'
     get:
       tags:
         - Books
       description: Get all books
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/getAllBookSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/getAllBookFailed'
+  /books/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: number
+          example: 2
+        required: true
     put:
       tags:
         - Books
       description: Update book
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/updateBookSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/updateBookFailed'
     delete:
       tags:
         - Books
       description: Delete book
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/deleteBookSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/deleteBookFailed'
+  /books/category:
+    get:
+      tags:
+        - Books
+      description: Get all book by category
+      responses:
+        '200':
+          $ref: '#/components/responses/getBookByCategorySuccess'
+        '400':
+          $ref: '#/components/responses/getBookByCategoryFailed'
+  /books/name:
+    get:
+      tags:
+        - Books
+      description: Get all book by title
+      responses:
+        '200':
+          $ref: '#/components/responses/getBookByTitleSuccess'
+        '400':
+          $ref: '#/components/responses/getBookByTitleFailed'
+  /books/author:
+    get:
+      tags:
+        - Books
+      description: Get all book by author
+      responses:
+        '200':
+          $ref: '#/components/responses/getBookByAuthorSuccess'
+        '400':
+          $ref: '#/components/responses/getBookByAuthorFailed'
+  /books/publisher:
+    get:
+      tags:
+        - Books
+      description: Get all book by publisher
+      responses:
+        '200':
+          $ref: '#/components/responses/getBookByPublisherSuccess'
+        '400':
+          $ref: '#/components/responses/getBookByPublisherFailed'
 
 
-  #
   #
   ####################################
   #  ACCOUNTS
@@ -172,14 +239,18 @@ paths:
       description: return all transaction history
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/getUserProfileSuccess'
+        '400':
+          $ref: '#/components/responses/getUserProfileFailed'
     post:
       tags:
         - Accounts
       description: make deposit
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/getUserProfileSuccess'
+        '400':
+          $ref: '#/components/responses/getUserProfileFailed'
 
 components:
   responses:
@@ -334,6 +405,243 @@ components:
               message:
                 type: string
                 example: Fail to Change Password
+    #==================================#
+    #    RESPONSE INSERT BOOK
+    #==================================#
+    insertBookSuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    insertBookFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+    #==================================#
+    #    RESPONSE GET ALL BOOK
+    #==================================#
+    getAllBookSuccess:
+      description: success change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Change Password
+    getAllBookFailed:
+      description: fail to change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Change Password
+    #==================================#
+    #    RESPONSE UPDATE BOOK
+    #==================================#
+    updateBookSuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    updateBookFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+    #==================================#
+    #    RESPONSE DELETE BOOK
+    #==================================#
+    deleteBookSuccess:
+      description: success change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Change Password
+    deleteBookFailed:
+      description: fail to change password
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Change Password
+    #==================================#
+    #    RESPONSE GET BOOK BY CATEGORY
+    #==================================#
+    getBookByCategorySuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    getBookByCategoryFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+    #==================================#
+    #    RESPONSE GET BOOK BY TITLE
+    #==================================#
+    getBookByTitleSuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    getBookByTitleFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+    #==================================#
+    #    RESPONSE GET BOOK BY AUTHOR
+    #==================================#
+    getBookByAuthorSuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    getBookByAuthorFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+    #==================================#
+    #    RESPONSE GET BOOK BY PUBLISHER
+    #==================================#
+    getBookByPublisherSuccess:
+      description: success insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Insert Book
+    getBookByPublisherFailed:
+      description: fail to insert book
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Insert Book
+
+
+
+
+
 
 
 
