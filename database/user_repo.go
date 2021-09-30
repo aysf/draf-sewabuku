@@ -1,21 +1,14 @@
 package database
 
 import (
-<<<<<<< HEAD
-	"sewabuku/middlewares"
-	"sewabuku/models"
-
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
-=======
 	"errors"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
->>>>>>> 162fabe65615ad0dcbb4468ed551a5c7ed315a4f
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type (
