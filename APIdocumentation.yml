@@ -239,18 +239,18 @@ paths:
       description: return all transaction history
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/getTransactionSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/getTransactionFailed'
     post:
       tags:
         - Accounts
       description: make deposit
       responses:
         '200':
-          $ref: '#/components/responses/getUserProfileSuccess'
+          $ref: '#/components/responses/createTransactionSuccess'
         '400':
-          $ref: '#/components/responses/getUserProfileFailed'
+          $ref: '#/components/responses/createTransactionSuccess'
 
 components:
   responses:
@@ -637,8 +637,64 @@ components:
               message:
                 type: string
                 example: Fail to Get Book By Publisher
-
-
+    #==================================#
+    #    RESPONSE GET TRANSACTION
+    #==================================#
+    getTransactionSuccess:
+      description: success get transaction
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Get Transaction
+    getTransactionFailed:
+      description: fail to get transaction
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Get Transaction
+    #==================================#
+    #    RESPONSE CREATE TRANSACTION
+    #==================================#
+    createTransactionSuccess:
+      description: success create transaction
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Create Transaction
+    createTransactionFailed:
+      description: fail to create transaction
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Create Transaction
 
 
 
