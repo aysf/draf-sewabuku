@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/labstack/echo/v4"
 	"sewabuku/controllers/book"
+
+	"github.com/labstack/echo/v4"
 )
 
 func BookPath(e *echo.Echo, bookController *book.Controller) {
@@ -11,6 +12,8 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 	bookGroup.GET("", bookController.GetAllBookController)
 
 	bookGroup.GET("/:id", bookController.GetBookController)
+
+	bookGroup.GET("/s/:keyword", bookController.SearchBookController)
 
 	//bookGroup.PUT("/:id", bookController.EditBookController)
 

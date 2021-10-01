@@ -1,17 +1,15 @@
 package models
 
-import "time"
-
 type BookData struct {
 	ID            uint `gorm:"primaryKey"`
 	Title         string
-	AuthorID      uint
-	PublisherID   uint
-	CategoryID    uint
-	PublisherDate time.Time
+	AuthorID      uint `gorm:"default:1"`
+	PublisherID   uint `gorm:"default:1"`
+	CategoryID    uint `gorm:"default:1"`
+	PublisherYear uint ``
 	Author        Author
 	Publisher     Publisher
-	Category      Catagory
+	Category      Category
 }
 
 type Publisher struct {
@@ -19,12 +17,15 @@ type Publisher struct {
 	Name string
 }
 
+type AuthorBook struct {
+}
+
 type Author struct {
 	ID   uint `gorm:"primaryKey"`
 	Name string
 }
 
-type Catagory struct {
+type Category struct {
 	ID   uint `gorm:"primaryKey"`
 	Name string
 }

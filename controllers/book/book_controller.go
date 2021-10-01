@@ -1,10 +1,11 @@
 package book
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"sewabuku/database"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Controller struct {
@@ -39,4 +40,17 @@ func (controller *Controller) GetBookController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, book)
+}
+
+func (controller *Controller) SearchBookController(c echo.Context) error {
+	keyword := "%" + c.Param("keyword") + "%"
+	category := "%" + c.QueryParam("category") + "%"
+	author := "%" + c.QueryParam("author") + "%"
+
+	books, err := controller.bookModel.Search(keyword, author, category)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "fail")
+	}
+
+	return c.JSON(http.StatusOK, books)
 }
