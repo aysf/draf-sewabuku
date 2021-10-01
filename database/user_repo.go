@@ -26,11 +26,22 @@ type (
 
 // NewUserModel is function to initialize new user model
 func NewUserModel(db *gorm.DB) *GormUserModel {
+
 	db.Exec(`
 	CREATE TRIGGER after_create_user
 	AFTER INSERT ON users FOR EACH ROW 
 	INSERT INTO accounts(balance, user_id)
-	VALUES (0, new.id);`)
+	VALUES (0, new.id);
+	CREATE VIEW user_profile AS
+	SELECT 	users.name,
+			users.email,
+			users.address,
+        	accounts.balance
+	FROM users
+	LEFT JOIN accounts
+	ON users.id = accounts.user_id;
+	`)
+
 	return &GormUserModel{db: db}
 }
 

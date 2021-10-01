@@ -25,7 +25,7 @@ func NewAccountModel(db *gorm.DB) *GormAccountModel {
 	UPDATE accounts
 	SET balance = balance + new.amount
 	WHERE id = new.account_id;`); err != nil {
-		fmt.Println("error")
+		fmt.Println("there is error during loading trigger after_entries_insert")
 	}
 	return &GormAccountModel{db: db}
 
