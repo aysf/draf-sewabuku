@@ -52,7 +52,13 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", "token: "+user.Token))
+	token := struct {
+		Token string `json:"token"`
+	}{
+		Token: user.Token,
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", token))
 }
 
 // GetUserProfileController is controller for get user profile
@@ -75,8 +81,8 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	c.Bind(&userRequest)
 
 	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
+		Name:  userRequest.Name,
+		Email: userRequest.Email,
 	}
 
 	newProfile, err := controller.userModel.UpdateProfile(user, userId)
