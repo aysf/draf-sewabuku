@@ -31,8 +31,9 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	CREATE TRIGGER after_create_user
 	AFTER INSERT ON users FOR EACH ROW 
 	INSERT INTO accounts(balance, user_id)
-	VALUES (0, new.id);
-	CREATE VIEW user_profile AS
+	VALUES (0, new.id);`)
+
+	db.Exec(`CREATE VIEW user_profile AS
 	SELECT 	users.name,
 			users.email,
 			users.address,
