@@ -113,7 +113,7 @@ func InsertDumyData(db *gorm.DB) {
 	// Book User mock
 	// ----------------
 
-	var BookUser = []models.Book{
+	var BookUser = []models.BookUser{
 		{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1},
 		{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2},
 		{BookDataID: 4, UserID: 1, RentPrice: 2400, Quantity: 1},
@@ -125,4 +125,5 @@ func InsertDumyData(db *gorm.DB) {
 	db.Create(&bookData)
 	db.Create(&User)
 	db.Create(&BookUser)
+
 }

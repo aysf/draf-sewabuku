@@ -14,10 +14,10 @@ type (
 	BookModel interface {
 		GetAll() ([]models.BookData, error)
 		Search(keyword, author, category string) (interface{}, error)
-		Get(bookId int) (models.Book, error)
-		Insert(models.Book) (models.Book, error)
-		Edit(book models.Book, bookId int) (models.Book, error)
-		Delete(bookId int) (models.Book, error)
+		Get(bookId int) (models.BookUser, error)
+		Insert(models.BookUser) (models.BookUser, error)
+		Edit(book models.BookUser, bookId int) (models.BookUser, error)
+		Delete(bookId int) (models.BookUser, error)
 	}
 )
 
@@ -59,23 +59,23 @@ func (g GormBookModel) Search(keyword, author, category string) (interface{}, er
 	return result, nil
 }
 
-func (g GormBookModel) AddBook(book models.Book) (models.Book, error) {
+func (g GormBookModel) AddBook(book models.BookUser) (models.BookUser, error) {
 	panic("implement me")
 }
 
-func (g GormBookModel) Get(bookId int) (models.Book, error) {
+func (g GormBookModel) Get(bookId int) (models.BookUser, error) {
 	panic("implement me")
 }
 
-func (g GormBookModel) Insert(book models.Book) (models.Book, error) {
+func (g GormBookModel) Insert(book models.BookUser) (models.BookUser, error) {
 	panic("implement me")
 }
 
-func (g GormBookModel) Edit(book models.Book, bookId int) (models.Book, error) {
+func (g GormBookModel) Edit(book models.BookUser, bookId int) (models.BookUser, error) {
 	panic("implement me")
 }
 
-func (g GormBookModel) Delete(bookId int) (models.Book, error) {
+func (g GormBookModel) Delete(bookId int) (models.BookUser, error) {
 	panic("implement me")
 }
 
