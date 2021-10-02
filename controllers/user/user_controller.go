@@ -40,7 +40,13 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
+	user := models.User{
+		Name:     userRequest.Name,
+		Email:    userRequest.Email,
+		Password: userRequest.Password,
+	}
+
+	_, err := controller.userModel.Register(user)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
