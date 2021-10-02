@@ -35,7 +35,7 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
