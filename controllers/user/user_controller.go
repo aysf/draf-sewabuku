@@ -26,7 +26,13 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	_, err := controller.userModel.Register(userRequest)
+	user := models.User{
+		Name:     userRequest.Name,
+		Email:    userRequest.Email,
+		Password: userRequest.Password,
+	}
+
+	_, err := controller.userModel.Register(user)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
@@ -40,13 +46,7 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
-	}
-
-	_, err := controller.userModel.Register(user)
+	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
@@ -71,7 +71,17 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
+	response := struct {
+		Name    string
+		Email   string
+		Address string
+	}{
+		Name: user.Name,
+		Email: user.Email,
+		Address: user.Address,
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", response))
 }
 
 // UpdateUserProfileController is controller for user edit their profile
