@@ -33,7 +33,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	INSERT INTO accounts(balance, user_id)
 	VALUES (0, new.id);`)
 
-	db.Exec(`CREATE VIEW user_profile AS
+	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
 	SELECT 	users.name,
 			users.email,
 			users.address,
@@ -48,7 +48,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
-	if user.Name == "" || user.Email == "" || user.Password == "" {
+	if &user.Name == nil || &user.Email == nil || &user.Password == nil {
 		err := errors.New("ALL FIELD CANNOT EMPTY")
 		return user, err
 	}

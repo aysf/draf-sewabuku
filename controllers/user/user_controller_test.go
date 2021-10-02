@@ -21,24 +21,6 @@ type userResponse struct {
 	Data    interface{} `json:"data"`
 }
 
-// Initialize gorm
-//var dbGorm *gorm.DB
-
-//func insertDummy(db *gorm.DB)  {
-//	// Prepare dummy data
-//	var newUser models.User
-//	newUser.Name = "Test Login"
-//	newUser.Email = "test1@test.com"
-//	newUser.Password = "RAHASIA"
-//
-//	// user dummy data with model
-//	customerModel := database.NewUserModel(db)
-//	_, err := customerModel.Register(newUser)
-//	if err != nil {
-//		log.Fatalln(err)
-//	}
-//}
-
 // TestController_RegisterUserController is unit testing for register controller
 func TestController_RegisterUserController(t *testing.T) {
 	//Initialize test cases
@@ -51,14 +33,14 @@ func TestController_RegisterUserController(t *testing.T) {
 	}{
 		{
 			name:            "test1",
-			reqBody:         map[string]string{"name": "kuuga", "email": "kamen@rider.jp", "password": "kuuga99"},
+			reqBody:         map[string]string{"name": "kuuga", "email": "kamen@rider.jp", "password": "kuuga99", "address": "japan"},
 			expectCode:      http.StatusOK,
 			responseStatus:  "success",
 			responseMessage: "Register Success",
 		},
 		{
 			name:            "test2",
-			reqBody:         map[string]string{"name": "agito", "email": "", "password": ""},
+			reqBody:         map[string]string{"name": "agito", "email": "", "password": "", "address": ""},
 			expectCode:      http.StatusBadRequest,
 			responseStatus:  "fail",
 			responseMessage: "Register Failed",
@@ -69,8 +51,14 @@ func TestController_RegisterUserController(t *testing.T) {
 	db := config.DBConnectTest()
 
 	// Drop and create new table
-	db.Migrator().DropTable(&models.User{})
-	db.AutoMigrate(&models.User{})
+	db.Migrator().DropTable(
+		&models.Account{},
+		&models.User{},
+	)
+	db.AutoMigrate(
+		&models.Account{},
+		&models.User{},
+	)
 
 	// Initialize server
 	e := echo.New()
@@ -84,12 +72,16 @@ func TestController_RegisterUserController(t *testing.T) {
 	// Process all test cases
 	for _, testCase := range testCases {
 		body, _ := json.Marshal(testCase.reqBody)
-		req := httptest.NewRequest(http.MethodPost, "/users/register", bytes.NewBuffer(body))
+		req := httptest.NewRequest(echo.POST, "/users/register", bytes.NewBuffer(body))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		res := httptest.NewRecorder()
 		ctx := e.NewContext(req, res)
 		if assert.NoError(t, controllerUser.RegisterUserController(ctx)) {
 			resBody := res.Body.String()
+
+			fmt.Println("-----------------------------------------")
+			fmt.Println(resBody)
+			fmt.Println("-----------------------------------------")
 
 			var response userResponse
 			json.Unmarshal([]byte(resBody), &response)
