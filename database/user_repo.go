@@ -32,7 +32,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	INSERT INTO accounts(balance, user_id)
 	VALUES (0, new.id);`)
 
-	db.Exec(`CREATE VIEW user_profile AS
+	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
 	SELECT 	users.name,
 			users.email,
 			users.address,
