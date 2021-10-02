@@ -79,10 +79,6 @@ func TestController_RegisterUserController(t *testing.T) {
 		if assert.NoError(t, controllerUser.RegisterUserController(ctx)) {
 			resBody := res.Body.String()
 
-			fmt.Println("-----------------------------------------")
-			fmt.Println(resBody)
-			fmt.Println("-----------------------------------------")
-
 			var response userResponse
 			json.Unmarshal([]byte(resBody), &response)
 
@@ -126,8 +122,6 @@ func TestController_LoginUserController(t *testing.T) {
 	db.AutoMigrate(&models.User{})
 
 	// Prepare dummy data
-	//cost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
-	//password, _ := bcrypt.GenerateFromPassword([]byte("1234pass"), cost)
 	newUser := models.User{
 		Name:     "Test Login",
 		Email:    "test1@test.com",
@@ -157,10 +151,6 @@ func TestController_LoginUserController(t *testing.T) {
 		ctx := e.NewContext(req, res)
 		if assert.NoError(t, controllerUser.LoginUserController(ctx)) {
 			resBody := res.Body.String()
-
-			fmt.Println("-----------------------------------------")
-			fmt.Println(resBody)
-			fmt.Println("-----------------------------------------")
 
 			var response userResponse
 			json.Unmarshal([]byte(resBody), &response)
