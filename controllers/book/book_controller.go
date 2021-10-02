@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sewabuku/database"
+	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
 	"strconv"
@@ -42,19 +43,22 @@ func (h *Controller) GetAllBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (controller *Controller) GetBookController(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+func (h *Controller) GetDetailsBook(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam("id"))
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		Response := util.ResponseError("internal error", nil)
+		return c.JSON(http.StatusBadRequest, Response)
 	}
 
-	book, err := controller.bookModel.Get(id)
+	books, err := h.bookModel.GetBookByID(uint(id))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
+		Response := util.ResponseError("error disini", nil)
+		return c.JSON(http.StatusBadRequest, Response)
 	}
 
-	return c.JSON(http.StatusOK, book)
+	response := util.ResponseSuccess("success", books)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (controller *Controller) SearchBookController(c echo.Context) error {
@@ -246,4 +250,15 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	response := util.ResponseSuccess("successfully create new publisher", input)
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *Controller) UpdatePhotoBook(c echo.Context) error {
+	_ = middlewares.ExtractTokenUserId(c)
+	_ = c.QueryParam("id")
+
+	// foto, file, err := c.Request().FormFile("file")
+
+	response := util.ResponseError("cannot create new author with same name which already exist", nil)
+	return c.JSON(http.StatusUnprocessableEntity, response)
+
 }

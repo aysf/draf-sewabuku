@@ -64,10 +64,22 @@ func InsertDumyData(db *gorm.DB) {
 			PublishYear: 2009,
 		},
 		{
-			Tittle:      "Hujan",
-			AuthorID:    9,
+			Tittle:      "Bandung Lautan Api",
+			AuthorID:    1,
+			PublisherID: 2,
+			CategoryID:  1,
+			PublishYear: 2010,
+		}, {
+			Tittle:      "masak",
+			AuthorID:    1,
 			PublisherID: 2,
 			CategoryID:  2,
+			PublishYear: 2010,
+		}, {
+			Tittle:      "surga yang indah",
+			AuthorID:    1,
+			PublisherID: 2,
+			CategoryID:  6,
 			PublishYear: 2010,
 		},
 	}
@@ -93,11 +105,13 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var Category = []models.Category{
-		{Name: "none"},
+		{Name: "sejarah"},
 		{Name: "novel"},
 		{Name: "motivasi"},
-		{Name: "nonfiksi"},
+		{Name: "non fiksi"},
 		{Name: "comic"},
+		{Name: "Agama"},
+		{Name: "horror"},
 	}
 
 	// ----------------
@@ -134,14 +148,16 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var BookUser = []models.BookUser{
-		{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1},
-		{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2},
-		{BookDataID: 3, UserID: 1, RentPrice: 2400, Quantity: 1},
-		{BookDataID: 4, UserID: 4, RentPrice: 1000, Quantity: 5},
-		{BookDataID: 5, UserID: 5, RentPrice: 1000, Quantity: 6},
-		{BookDataID: 6, UserID: 7, RentPrice: 500, Quantity: 7},
-		{BookDataID: 7, UserID: 5, RentPrice: 1000, Quantity: 3},
-		{BookDataID: 8, UserID: 5, RentPrice: 200, Quantity: 2},
+		{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1, FileFoto: "default.jpg"},
+		{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2, FileFoto: "default.jpg"},
+		{BookDataID: 3, UserID: 1, RentPrice: 2400, Quantity: 1, FileFoto: "default.jpg"},
+		{BookDataID: 4, UserID: 4, RentPrice: 1000, Quantity: 5, FileFoto: "default.jpg"},
+		{BookDataID: 5, UserID: 5, RentPrice: 1000, Quantity: 6, FileFoto: "default.jpg"},
+		{BookDataID: 6, UserID: 7, RentPrice: 500, Quantity: 7, FileFoto: "default.jpg"},
+		{BookDataID: 7, UserID: 5, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
+		{BookDataID: 8, UserID: 4, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
+		{BookDataID: 9, UserID: 3, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
+		{BookDataID: 10, UserID: 1, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
 	}
 
 	db.Create(&Category)

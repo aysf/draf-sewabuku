@@ -18,7 +18,15 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	bookGroup.GET("/", bookController.GetAllBooks)
 
-	bookGroup.GET("/category/:id", bookController.GetByCategoryID)
+	bookGroup.GET("/category", bookController.GetByCategoryID)
 
-	//bookGroup.DELETE("/:id", bookController.DeleteBookController)
+	bookGroup.GET("/listauthor", bookController.GetListAuthor)
+
+	bookGroup.GET("/listcategory", bookController.GetListCategory)
+
+	bookGroup.GET("/listpublisher", bookController.GetListPublisher)
+
+	bookGroup.GET("/name", bookController.GetBookByname)
+
+	bookGroup.GET("/", bookController.GetDetailsBook)
 }
