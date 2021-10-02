@@ -16,7 +16,9 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	bookGroup.GET("/s/:keyword", bookController.SearchBookController)
 
-	//bookGroup.PUT("/:id", bookController.EditBookController)
+	bookGroup.GET("/", bookController.GetAllBooks)
+
+	bookGroup.GET("/category/:id", bookController.GetByCategoryID)
 
 	//bookGroup.DELETE("/:id", bookController.DeleteBookController)
 }
