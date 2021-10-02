@@ -33,14 +33,14 @@ func TestController_RegisterUserController(t *testing.T) {
 	}{
 		{
 			name:            "test1",
-			reqBody:         map[string]string{"name": "kuuga", "email": "kamen@rider.jp", "password": "kuuga99"},
+			reqBody:         map[string]string{"name": "kuuga", "email": "kamen@rider.jp", "password": "kuuga99", "address": "japan"},
 			expectCode:      http.StatusOK,
 			responseStatus:  "success",
 			responseMessage: "Register Success",
 		},
 		{
 			name:            "test2",
-			reqBody:         map[string]string{"name": "agito", "email": "", "password": ""},
+			reqBody:         map[string]string{"name": "agito", "email": "", "password": "", "address": ""},
 			expectCode:      http.StatusBadRequest,
 			responseStatus:  "fail",
 			responseMessage: "Register Failed",

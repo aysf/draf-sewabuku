@@ -26,16 +26,10 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
-	}
-
-	_, err := controller.userModel.Register(user)
+	_, err := controller.userModel.Register(userRequest)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", err.Error()))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
