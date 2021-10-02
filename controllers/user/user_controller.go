@@ -71,7 +71,17 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
+	response := struct {
+		Name    string
+		Email   string
+		Address string
+	}{
+		Name: user.Name,
+		Email: user.Email,
+		Address: user.Address,
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", response))
 }
 
 // UpdateUserProfileController is controller for user edit their profile
