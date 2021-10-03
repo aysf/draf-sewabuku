@@ -55,7 +55,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
-	if user.Name == "" || user.Email == "" || user.Password == "" {
+	if user.Name == "" || user.Email == "" || user.Password == "" || user.Address == "" {
 		err := errors.New("ALL FIELD CANNOT EMPTY")
 		return user, err
 	}

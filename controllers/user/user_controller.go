@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -24,6 +25,8 @@ func NewController(userModel database.UserModel) *Controller {
 // RegisterUserController is controller for user registration
 func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
+	fmt.Println("email", userRequest.Email)
+	fmt.Println("id", userRequest.ID)
 	c.Bind(&userRequest)
 
 	user := models.User{
