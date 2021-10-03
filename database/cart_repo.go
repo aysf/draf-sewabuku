@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"sewabuku/models"
 	"time"
 
@@ -37,8 +36,6 @@ func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (models.Cart,
 	if tx.Error != nil {
 		return cart, tx.Error
 	}
-	fmt.Println("row yg terpengaruh -->", tx.RowsAffected)
-	fmt.Println("cek format data -->", cart.DateReturn)
 
 	if err := g.db.Model(&cart).Update("date_return", Date).Error; err != nil {
 		return cart, err
@@ -76,12 +73,12 @@ func NewCartModel(db *gorm.DB) *GormCartModel {
 	CREATE TRIGGER after_cart_insert_lender
 	AFTER INSERT ON carts
 	FOR EACH ROW
-	INSERT INTO entries (account_id, amount) VALUES ((select user_id from book_users where book_users.id = new.book_user_id), DATEDIFF(new.date_due, new.date_loan) * (select rent_price from book_users where book_users.id = new.book_user_id)); `)
+	INSERT INTO entries (account_id, amount, created_at) VALUES ((select user_id from book_users where book_users.id = new.book_user_id), DATEDIFF(new.date_due, new.date_loan) * (select rent_price from book_users where book_users.id = new.book_user_id), now()); `)
 
 	db.Exec(`
 	CREATE TRIGGER after_cart_insert_borrower
 	AFTER INSERT ON carts
 	FOR EACH ROW
-	INSERT INTO entries (account_id, amount) VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(rent_price AS SIGNED) from book_users where book_users.id = new.book_user_id));`)
+	INSERT INTO entries (account_id, amount, created_at) VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(rent_price AS SIGNED) from book_users where book_users.id = new.book_user_id), now());`)
 	return &GormCartModel{db: db}
 }

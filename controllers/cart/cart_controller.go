@@ -1,7 +1,6 @@
 package cart
 
 import (
-	"fmt"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -52,8 +51,6 @@ func (controller *Controller) ReturnBook(c echo.Context) error {
 	updateDate := models.Cart{
 		DateReturn: Date.DateReturn,
 	}
-
-	fmt.Println("format updateDate -->", updateDate.DateReturn)
 
 	returnBook, err := controller.cartModel.Return(updateDate.DateReturn, userId, int(Date.BookUserID))
 
