@@ -1,5 +1,23 @@
 package models
 
+type Book struct {
+	ID          uint   `db:"id"`
+	Title       string `db:"title"`
+	AuthorID    uint   `db:"author_id" json:"author_id"`
+	PublishYear uint   `db:"publish_year" json:"publish_year"`
+	CategoryID  uint   `db:"category_id" json:"category_id"`
+	PublisherID uint   `db:"publisher_id" json:"publisher_id"`
+	UserID      uint
+	RentPrice   uint
+	Quantity    uint
+	Rating      uint
+	Description string
+	FileFoto    string
+	Author      Author    `db:"authors" json:"authors"`
+	Publisher   Publisher `db:"publishers" json:"publishers"`
+	Category    Category  `db:"categories" json:"categories"`
+}
+
 type BookData struct {
 	ID          uint      `db:"id"`
 	Tittle      string    `db:"tittle"`
