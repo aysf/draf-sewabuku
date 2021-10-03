@@ -31,8 +31,9 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	CREATE TRIGGER after_create_user
 	AFTER INSERT ON users FOR EACH ROW 
 	INSERT INTO accounts(balance, user_id)
-	VALUES (0, new.id);
-	CREATE VIEW user_profile AS
+	VALUES (0, new.id);`)
+
+	db.Exec(`CREATE VIEW user_profile AS
 	SELECT 	users.name,
 			users.email,
 			users.address,
@@ -47,7 +48,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
-	if user.Name == "" || user.Email == "" || user.Password == "" {
+	if user.Name == "" || user.Email == "" || user.Password == "" || user.Address == "" {
 		err := errors.New("ALL FIELD CANNOT EMPTY")
 		return user, err
 	}

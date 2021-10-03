@@ -4,6 +4,7 @@ import (
 	"sewabuku/config"
 	"sewabuku/controllers/account"
 	"sewabuku/controllers/book"
+	"sewabuku/controllers/cart"
 	"sewabuku/controllers/user"
 	"sewabuku/database"
 	m "sewabuku/middlewares"
@@ -23,17 +24,21 @@ func main() {
 	bookModel := database.NewBookModel(db)
 	userModel := database.NewUserModel(db)
 	accountModel := database.NewAccountModel(db)
+	cartModel := database.NewCartModel(db)
+
 	config.InsertDumyData(db)
 
 	// Initialize controller
 	newUserController := user.NewController(userModel)
 	newAccountController := account.NewController(accountModel)
 	newBookController := book.NewBookController(bookModel)
+	newCartController := cart.NewCartController(cartModel)
 
 	// API path and controller
 	routes.UserPath(e, newUserController)
 	routes.BookPath(e, newBookController)
 	routes.AccountPath(e, newAccountController)
+	routes.CartPath(e, newCartController)
 
 	// run server
 	m.LogMiddlewares(e)
