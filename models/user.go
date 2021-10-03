@@ -11,8 +11,3 @@ type User struct {
 	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"-"`
 }
-
-type UserResponse struct {
-	Name    string `json:"name" form:"name" gorm:"not null"`
-	Address string `json:"address" form:"address" gorm:"default:none"`
-}

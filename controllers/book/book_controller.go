@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"sewabuku/database"
-	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
 	"strconv"
@@ -252,13 +251,40 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h *Controller) UpdatePhotoBook(c echo.Context) error {
-	_ = middlewares.ExtractTokenUserId(c)
-	_ = c.QueryParam("id")
+// func (h *Controller) UpdatePhotoBook(c echo.Context) error {
+// 	user_id := middlewares.ExtractTokenUserId(c)
+// 	id := c.QueryParam("id")
 
-	// foto, file, err := c.Request().FormFile("file")
+// 	foto, file, err := c.Request().FormFile("file")
 
-	response := util.ResponseError("cannot create new author with same name which already exist", nil)
-	return c.JSON(http.StatusUnprocessableEntity, response)
+// 	response := util.ResponseError("cannot create new author with same name which already exist", nil)
+// 	return c.JSON(http.StatusUnprocessableEntity, response)
 
+// }
+
+func (h *Controller) InserBook(c echo.Context) error {
+	var input models.InputBook
+
+	err := c.Bind(&input)
+	if err != nil {
+		response := util.ResponseError("error internal", nil)
+		c.JSON(http.StatusInternalServerError, response)
+	}
+
+	if input.Title == "" || input.PublishYear == 0 {
+		response := util.ResponseFail("please input name of your book and year of publishment of your book", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if input.CategoryID == 0 {
+		input.CategoryID = 1
+	}
+	if input.AuthorID == 0 {
+		input.AuthorID = 1
+	}
+	if input.PublisherID == 0 {
+		input.PublisherID = 1
+	}
+	response := util.ResponseSuccess("successfully create new publisher", input)
+	return c.JSON(http.StatusOK, response)
 }
