@@ -438,7 +438,7 @@ components:
     #    RESPONSE GET ALL BOOK
     #==================================#
     getAllBookSuccess:
-      description: success get all book
+      description: success get all books
       content:
         application/json:
           schema:

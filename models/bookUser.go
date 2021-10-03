@@ -8,6 +8,7 @@ type BookUser struct {
 	Quantity    uint
 	Rating      uint
 	Description string
+	FileFoto    string
 	BookData    BookData
 	User        User
 }

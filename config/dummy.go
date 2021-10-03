@@ -15,46 +15,72 @@ func InsertDumyData(db *gorm.DB) {
 
 	var bookData = []models.BookData{
 		{
-			Title:         "Rich Dad Poor Dad",
-			AuthorID:      3,
-			PublisherID:   2,
-			CategoryID:    3,
-			PublisherYear: 1997,
+			Tittle:      "Rich Dad Poor Dad",
+			AuthorID:    3,
+			PublisherID: 2,
+			CategoryID:  3,
+			PublishYear: 1997,
 		},
 		{
-			Title:         "Kambing Jantan",
-			AuthorID:      4,
-			PublisherID:   4,
-			CategoryID:    4,
-			PublisherYear: 2002,
+			Tittle:      "Kambing Jantan",
+			AuthorID:    4,
+			PublisherID: 4,
+			CategoryID:  4,
+			PublishYear: 2002,
 		},
 		{
-			Title:         "Rumah Seribu Malaikat",
-			AuthorID:      5,
-			PublisherID:   3,
-			CategoryID:    4,
-			PublisherYear: 2009,
+			Tittle:      "Rumah Seribu Malaikat",
+			AuthorID:    5,
+			PublisherID: 3,
+			CategoryID:  4,
+			PublishYear: 2009,
 		},
 		{
-			Title:         "The Cruel Prince",
-			AuthorID:      6,
-			PublisherID:   5,
-			CategoryID:    2,
-			PublisherYear: 2009,
+			Tittle:      "The Cruel Prince",
+			AuthorID:    6,
+			PublisherID: 5,
+			CategoryID:  2,
+			PublishYear: 2009,
 		},
 		{
-			Title:         "The Black Box",
-			AuthorID:      7,
-			PublisherID:   6,
-			CategoryID:    2,
-			PublisherYear: 2009,
+			Tittle:      "The Black Box",
+			AuthorID:    7,
+			PublisherID: 6,
+			CategoryID:  2,
+			PublishYear: 2009,
 		},
 		{
-			Title:         "Black Clover",
-			AuthorID:      8,
-			PublisherID:   1,
-			CategoryID:    5,
-			PublisherYear: 1999,
+			Tittle:      "Black Clover",
+			AuthorID:    8,
+			PublisherID: 1,
+			CategoryID:  5,
+			PublishYear: 1999,
+		},
+		{
+			Tittle:      "Langit Bumi",
+			AuthorID:    6,
+			PublisherID: 3,
+			CategoryID:  2,
+			PublishYear: 2009,
+		},
+		{
+			Tittle:      "Bandung Lautan Api",
+			AuthorID:    1,
+			PublisherID: 2,
+			CategoryID:  1,
+			PublishYear: 2010,
+		}, {
+			Tittle:      "masak",
+			AuthorID:    1,
+			PublisherID: 2,
+			CategoryID:  2,
+			PublishYear: 2010,
+		}, {
+			Tittle:      "surga yang indah",
+			AuthorID:    1,
+			PublisherID: 2,
+			CategoryID:  6,
+			PublishYear: 2010,
 		},
 	}
 
@@ -71,6 +97,7 @@ func InsertDumyData(db *gorm.DB) {
 		{Name: "Holly Black"},
 		{Name: "Michael, Connelly"},
 		{Name: "Tabata & Yuuki"},
+		{Name: "Tere liye"},
 	}
 
 	// ----------------
@@ -78,11 +105,13 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var Category = []models.Category{
-		{Name: "none"},
+		{Name: "sejarah"},
 		{Name: "novel"},
 		{Name: "motivasi"},
-		{Name: "nonfiksi"},
+		{Name: "non fiksi"},
 		{Name: "comic"},
+		{Name: "Agama"},
+		{Name: "horror"},
 	}
 
 	// ----------------
@@ -105,8 +134,13 @@ func InsertDumyData(db *gorm.DB) {
 	pass, _ := bcrypt.GenerateFromPassword([]byte("123"), 14)
 	passStr := string(pass)
 	var User = []models.User{
-		{Name: "Ani", Email: "ani@g.c", Password: passStr},
-		{Name: "Budi", Email: "budi@g.c", Password: passStr},
+		{Name: "Ani", Email: "ani@g.c", Password: passStr, Address: "jakarta"},
+		{Name: "Budi", Email: "budi@g.c", Password: passStr, Address: "depok"},
+		{Name: "Danang", Email: "danang@.com", Password: passStr, Address: "bandung"},
+		{Name: "Sanas", Email: "sanas@gmail.", Password: passStr, Address: "sumedang"},
+		{Name: "kokoh", Email: "kooko@.com", Password: passStr, Address: "cikarang"},
+		{Name: "Saness", Email: "saneess@gmail.", Password: passStr, Address: "surabaya"},
+		{Name: "kokoh", Email: "koiooako@.com", Password: passStr, Address: "palembang"},
 	}
 
 	// ----------------
@@ -114,9 +148,16 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var BookUser = []models.BookUser{
-		{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1},
-		{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2},
-		{BookDataID: 4, UserID: 1, RentPrice: 2400, Quantity: 1},
+		{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1, FileFoto: "default.jpg"},
+		{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2, FileFoto: "default.jpg"},
+		{BookDataID: 3, UserID: 1, RentPrice: 2400, Quantity: 1, FileFoto: "default.jpg"},
+		{BookDataID: 4, UserID: 4, RentPrice: 1000, Quantity: 5, FileFoto: "default.jpg"},
+		{BookDataID: 5, UserID: 5, RentPrice: 1000, Quantity: 6, FileFoto: "default.jpg"},
+		{BookDataID: 6, UserID: 7, RentPrice: 500, Quantity: 7, FileFoto: "default.jpg"},
+		{BookDataID: 7, UserID: 5, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
+		{BookDataID: 8, UserID: 4, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
+		{BookDataID: 9, UserID: 3, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
+		{BookDataID: 10, UserID: 1, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
 	}
 
 	db.Create(&Category)
