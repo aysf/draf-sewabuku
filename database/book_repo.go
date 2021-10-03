@@ -24,13 +24,13 @@ type (
 		Insert(models.BookUser) (models.BookUser, error)
 		Edit(book models.BookUser, bookId int) (models.BookUser, error)
 		Delete(bookId int) (models.BookUser, error)
-		UpdateBook(input models.BookData) (models.BookData, error)
 		GetBookByID(id uint) (models.BookRespone, error)
-		GetByAuthorID(id int) ([]models.BookData, error)
+		GetByAuthorID(id int) ([]models.BookRespone, error)
 		GetByPublisherID(id int) ([]models.BookData, error)
 		ListCategory() ([]models.Category, error)
 		CreateNewAuthor(input models.Author) (models.Author, error)
 		CreateNewPublisher(input models.Publisher) (models.Publisher, error)
+		UpdatePhoto(file string, book_id int) (models.BookRespone, error)
 	}
 )
 
@@ -108,16 +108,6 @@ func (r *GormBookModel) InputBook(input models.BookData) (models.BookData, error
 	return input, nil
 }
 
-func (r *GormBookModel) UpdateBook(input models.BookData) (models.BookData, error) {
-
-	err := r.db.Save(&input).Error
-	if err != nil {
-		return input, err
-	}
-
-	return input, nil
-}
-
 func (r *GormBookModel) GetBookByID(id uint) (models.BookRespone, error) {
 	var book models.BookRespone
 
@@ -131,14 +121,14 @@ func (r *GormBookModel) GetBookByID(id uint) (models.BookRespone, error) {
 	return book, nil
 }
 
-func (r *GormBookModel) GetByAuthorID(id int) ([]models.BookData, error) {
-	var books []models.BookData
-	querry := `SELECT bd.*, c.id as "categories.id", c.name as "categories.name", p.id as "publishers.id", p.name as "publishers.name", a.id as "authors.id", a.name as "authors.name" FROM book_data bd JOIN categories c ON bd.category_id = c.id JOIN publishers p ON bd.publisher_id = p.id JOIN authors a ON bd.author_id = a.id WHERE a.id = ?`
+func (r *GormBookModel) GetByAuthorID(id int) ([]models.BookRespone, error) {
+	var books []models.BookRespone
+	querry := `SELECT id, tittle, address, price, quantity, photo, author, author_id, publisher, publisher_id, category, category_id FROM responsebook WHERE author_id = ?`
 
 	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Raw(querry, id).Find(&books).Error
 
 	if err != nil {
-		return []models.BookData{}, err
+		return books, err
 	}
 
 	return books, nil
@@ -146,7 +136,7 @@ func (r *GormBookModel) GetByAuthorID(id int) ([]models.BookData, error) {
 
 func (r *GormBookModel) GetByPublisherID(id int) ([]models.BookData, error) {
 	var books []models.BookData
-	querry := `SELECT bd.*, c.id as "categories.id", c.name as "categories.name", p.id as "publishers.id", p.name as "publishers.name", a.id as "authors.id", a.name as "authors.name" FROM book_data bd JOIN categories c ON bd.category_id = c.id JOIN publishers p ON bd.publisher_id = p.id JOIN authors a ON bd.author_id = a.id WHERE p.id = ?`
+	querry := `SELECT id, tittle, address, price, quantity, photo, author, author_id, publisher, publisher_id, category, category_id FROM responsebook WHERE publisher_id = ?`
 
 	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Raw(querry, id).Find(&books).Error
 
@@ -162,6 +152,11 @@ func (r *GormBookModel) DeleteBook(id uint) error {
 	var book models.BookData
 	err := r.db.Where("id = ?", id).Delete(&book).Error
 
+	if err != nil {
+		return err
+	}
+	var bookUser models.BookUser
+	err = r.db.Where("book_data_id = ?", id).Delete(&bookUser).Error
 	if err != nil {
 		return err
 	}
@@ -196,6 +191,22 @@ func (r *GormBookModel) CreateNewPublisher(input models.Publisher) (models.Publi
 	}
 
 	return input, nil
+}
+
+func (r *GormBookModel) UpdatePhoto(file string, book_id int) (models.BookRespone, error) {
+
+	var response models.BookRespone
+	err := r.db.Model(&models.BookUser{}).Where("book_data_id", book_id).Update("file_foto", file).Error
+	if err != nil {
+		return response, err
+	}
+	querry := `SELECT * FROM responsebook WHERE id = ?`
+	err = r.db.Preload("Author").Preload("Publisher").Preload("Category").Raw(querry, book_id).Find(&response).Error
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
 }
 
 func (g GormBookModel) GetAll() ([]models.BookData, error) {

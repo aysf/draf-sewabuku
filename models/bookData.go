@@ -52,4 +52,6 @@ type InputBook struct {
 	PublisherID uint   `json:"publisher_id"`
 	PublishYear uint   `json:"publish_year"`
 	Price       uint16 `json:"price"`
+	Quantity    uint   `json:"quantity"`
+	Description string `jon:"description"`
 }
