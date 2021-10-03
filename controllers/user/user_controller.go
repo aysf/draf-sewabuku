@@ -53,7 +53,7 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", nil))
 	}
 
 	token := struct {

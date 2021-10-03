@@ -15,10 +15,16 @@ type (
 	GormUserModel struct {
 		db *gorm.DB
 	}
+	UserProfile struct {
+		Name    string `json:"name"`
+		Email   string `json:"email"`
+		Address string `json:"address"`
+		Balance uint   `json:"balance"`
+	}
 	UserModel interface {
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
-		GetProfile(userId int) (models.User, error)
+		GetProfile(userId int) (UserProfile, error)
 		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 	}
@@ -33,8 +39,9 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	INSERT INTO accounts(balance, user_id)
 	VALUES (0, new.id);`)
 
-	db.Exec(`CREATE VIEW user_profile AS
-	SELECT 	users.name,
+	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
+	SELECT 	users.id,
+			users.name,
 			users.email,
 			users.address,
         	accounts.balance
@@ -89,11 +96,16 @@ func (g *GormUserModel) Login(email, password string) (models.User, error) {
 }
 
 // GetProfile is  method to get user profile
-func (g *GormUserModel) GetProfile(userId int) (models.User, error) {
-	var user models.User
+func (g *GormUserModel) GetProfile(userId int) (UserProfile, error) {
+	var user UserProfile
 
-	if err := g.db.Find(&user, userId).Error; err != nil {
+	if err := g.db.Raw("SELECT * FROM user_profile WHERE id = ?", userId).Scan(&user).Error; err != nil {
 		return user, err
+
+		//var user models.User
+		//
+		//if err := g.db.Find(&user, userId).Error; err != nil {
+		//	return user, err
 	}
 
 	return user, nil
