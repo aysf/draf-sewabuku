@@ -34,7 +34,7 @@ type Category struct {
 }
 
 type InputBook struct {
-	Title       string `json:"title"`
+	Tittle      string `json:"tittle"`
 	CategoryID  uint   `json:"category_id"`
 	AuthorID    uint   `json:"author_id"`
 	PublisherID uint   `json:"publisher_id"`

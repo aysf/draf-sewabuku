@@ -30,6 +30,8 @@ type (
 		CheckAuthorName(name string) (bool, error)
 		CheckPublisherName(name string) (bool, error)
 		BorrowBook(book_id, user_id int) (models.Cart, error)
+		InsertNewBook(input models.BookData) (models.BookData, error)
+		CheckBorrowBook(user_id int) (bool, error)
 	}
 )
 
@@ -88,9 +90,9 @@ func (r *GormBookModel) GetListPublisher() ([]models.Publisher, error) {
 func (r *GormBookModel) GetByNameBook(namebook string) ([]models.BookData, error) {
 	var books []models.BookData
 
-	querry := `SELECT b.id, b.tittle, b.price, b.quantity, b.photo, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id WHERE b.tittle LIKE ?`
+	querry := `SELECT b.id, b.tittle, b.photo, b.publish_year, b.price, b.quantity, b.description, b.user_id, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id WHERE b.tittle LIKE ?`
 
-	err := r.db.Preload("User").Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry, "%"+namebook+"%").Find(&books).Error
+	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry, "%"+namebook+"%").Find(&books).Error
 	if err != nil {
 		return books, err
 	}
@@ -192,12 +194,7 @@ func (r *GormBookModel) CreateNewPublisher(input models.Publisher) (models.Publi
 func (r *GormBookModel) UpdatePhoto(file string, book_id int) (models.BookData, error) {
 
 	var response models.BookData
-	err := r.db.Model(&models.BookData{}).Where("book_data_id", book_id).Update("file_foto", file).Error
-	if err != nil {
-		return response, err
-	}
-	querry := `SELECT * FROM responsebook WHERE id = ?`
-	err = r.db.Preload("Author").Preload("Publisher").Preload("Category").Raw(querry, book_id).Find(&response).Error
+	err := r.db.Model(&models.BookData{}).Where("id", book_id).Update("photo", file).Error
 	if err != nil {
 		return response, err
 	}
@@ -239,6 +236,38 @@ func (r *GormBookModel) CheckPublisherName(name string) (bool, error) {
 	return true, nil
 }
 
+func (r *GormBookModel) InsertNewBook(input models.BookData) (models.BookData, error) {
+	err := r.db.Create(&input).Error
+	if err != nil {
+		return input, err
+	}
+
+	querry := `SELECT b.*, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id WHERE b.id = ?`
+
+	var book models.BookData
+	err = r.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry, input.ID).Find(&book).Error
+	if err != nil {
+		return book, err
+	}
+
+	return book, nil
+}
+
+func (r *GormBookModel) CheckBorrowBook(user_id int) (bool, error) {
+	qurry := `SELECT * FROM carts WHERE user_id = ?`
+
+	var cart models.Cart
+	err := r.db.Raw(qurry, user_id).Find(&cart).Error
+	if err != nil {
+		return false, err
+	}
+	if cart.BookDataID != 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (r *GormBookModel) BorrowBook(book_id, user_id int) (models.Cart, error) {
 	cart := models.Cart{
 		UserID:     uint(user_id),
@@ -249,6 +278,11 @@ func (r *GormBookModel) BorrowBook(book_id, user_id int) (models.Cart, error) {
 	}
 
 	err := r.db.Create(&cart).Error
+	if err != nil {
+		return cart, err
+	}
+
+	err = r.db.Model(&models.BookData{}).Where("id", book_id).Update("quantity", -1).Error
 	if err != nil {
 		return cart, err
 	}

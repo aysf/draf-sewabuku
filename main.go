@@ -23,7 +23,7 @@ func main() {
 	bookModel := database.NewBookModel(db)
 	userModel := database.NewUserModel(db)
 	accountModel := database.NewAccountModel(db)
-	config.InsertDumyData(db)
+	// config.InsertDumyData(db)
 
 	// Initialize controller
 	newUserController := user.NewController(userModel)
