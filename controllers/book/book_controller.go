@@ -216,6 +216,7 @@ func (h *Controller) GetByPublisherID(c echo.Context) error {
 }
 
 func (h *Controller) CreateNewPublisher(c echo.Context) error {
+	_ = middlewares.ExtractTokenUserId(c)
 	name := c.FormValue("name")
 	name = strings.ToLower(name)
 	name = strings.TrimSpace(fmt.Sprintf("%v", name))
