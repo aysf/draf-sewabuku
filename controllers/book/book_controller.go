@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sewabuku/database"
+	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
 	"strconv"
@@ -22,14 +23,16 @@ func NewBookController(bookModel database.BookModel) *Controller {
 	}
 }
 
-func (controller *Controller) GetAllBookController(c echo.Context) error {
-	book, err := controller.bookModel.GetAll()
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+const ExtensionAllowed = ".jpg, .jpeg, .png"
 
-	return c.JSON(http.StatusOK, book)
-}
+// func (controller *Controller) GetAllBookController(c echo.Context) error {
+// 	book, err := controller.bookModel.GetAll()
+// 	if err != nil {
+// 		return c.JSON(http.StatusBadRequest, "fail")
+// 	}
+
+// 	return c.JSON(http.StatusOK, book)
+// }
 
 func (h *Controller) GetAllBooks(c echo.Context) error {
 	books, err := h.bookModel.GetAllBooks()
@@ -38,7 +41,9 @@ func (h *Controller) GetAllBooks(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
-	response := util.ResponseSuccess("success get books", books)
+	responseBook := FormatResponseBooks(books)
+
+	response := util.ResponseSuccess("success get all books", responseBook)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -56,7 +61,9 @@ func (h *Controller) GetDetailsBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
-	response := util.ResponseSuccess("success", books)
+	responseFormat := FormatDetailsBook(books)
+
+	response := util.ResponseSuccess("success", responseFormat)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -87,7 +94,9 @@ func (h *Controller) GetBookByname(c echo.Context) error {
 		return c.JSON(http.StatusOK, response)
 	}
 
-	response := util.ResponseSuccess("ok", books)
+	responseBook := FormatResponseBooks(books)
+
+	response := util.ResponseSuccess("ok", responseBook)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -110,7 +119,9 @@ func (h *Controller) GetByCategoryID(c echo.Context) error {
 		return c.JSON(http.StatusOK, response)
 	}
 
-	response := util.ResponseSuccess("success", books)
+	responseBook := FormatResponseBooks(books)
+
+	response := util.ResponseSuccess("success", responseBook)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -167,7 +178,9 @@ func (h *Controller) GetByAuthorID(c echo.Context) error {
 
 	}
 
-	response := util.ResponseSuccess("success", books)
+	responseBook := FormatResponseBooks(books)
+
+	response := util.ResponseSuccess("success", responseBook)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -191,8 +204,9 @@ func (h *Controller) GetByPublisherID(c echo.Context) error {
 		return c.JSON(http.StatusOK, response)
 
 	}
+	responseBook := FormatResponseBooks(books)
 
-	response := util.ResponseSuccess("success", books)
+	response := util.ResponseSuccess("success", responseBook)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -208,20 +222,33 @@ func (h *Controller) CreateNewPublisher(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 
 	}
+	check, err := h.bookModel.CheckPublisherName(name)
+	if err != nil {
+		response := util.ResponseError("failed error", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if !check {
+		response := util.ResponseFail("cannot input name author with same name which already exist", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
 	var input models.Publisher
 	input.Name = name
 
-	input, err := h.bookModel.CreateNewPublisher(input)
+	publisher, err := h.bookModel.CreateNewPublisher(input)
 	if err != nil {
 		response := util.ResponseError(err.Error(), nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	response := util.ResponseSuccess("successfully create new publisher", input)
+	response := util.ResponseSuccess("successfully create new publisher", publisher)
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *Controller) CreateNewAuthor(c echo.Context) error {
+
+	_ = middlewares.ExtractTokenUserId(c)
 	name := c.FormValue("name")
 	name = strings.ToLower(name)
 	name = strings.TrimSpace(fmt.Sprintf("%v", name))
@@ -233,6 +260,17 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	}
 
+	check, err := h.bookModel.CheckAuthorName(name)
+	if err != nil {
+		response := util.ResponseError("failed error", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if !check {
+		response := util.ResponseFail("cannot input name author with same name which already exist", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
 	var input models.Author
 	input.Name = name
 	author, err := h.bookModel.CreateNewAuthor(input)
@@ -241,15 +279,65 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 
 	}
-	if author.Name == name {
-		response := util.ResponseError("cannot create new author with same name which already exist", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
 
-	}
-
-	response := util.ResponseSuccess("successfully create new publisher", input)
+	response := util.ResponseSuccess("successfully create new publisher", author)
 	return c.JSON(http.StatusOK, response)
 }
+
+func (h *Controller) BorrowBook(c echo.Context) error {
+	user_id := middlewares.ExtractTokenUserId(c)
+
+	bookID, _ := strconv.Atoi(c.QueryParam("id"))
+
+	check, err := h.bookModel.GetBookByID(uint(bookID))
+	if err != nil {
+		response := util.ResponseError("failed", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+	if check.Quantity == 0 {
+		response := util.ResponseFail("sorry someone is borrowing this book, please wait until it get returned ", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	carts, err := h.bookModel.BorrowBook(bookID, user_id)
+	if err != nil {
+		response := util.ResponseError("failed to borrow book", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	response := util.ResponseSuccess("successfully asking for borrow books", carts)
+	return c.JSON(http.StatusOK, response)
+
+}
+
+// func (h *Controller) InsertBook(c echo.Context) error {
+// 	user_id := middlewares.ExtractTokenUserId(c)
+
+// 	var input models.InputBook
+
+// 	err := c.Bind(&input)
+// 	if err != nil {
+// 		response := util.ResponseError("error internal", nil)
+// 		c.JSON(http.StatusInternalServerError, response)
+// 	}
+
+// 	if input.Title == "" || input.PublishYear == 0 {
+// 		response := util.ResponseFail("please input name of your book and year of publishment of your book", nil)
+// 		c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
+
+// 	if input.CategoryID == 0 {
+// 		input.CategoryID = 1
+// 	}
+// 	if input.AuthorID == 0 {
+// 		input.AuthorID = 1
+// 	}
+// 	if input.PublisherID == 0 {
+// 		input.PublisherID = 1
+// 	}
+// 	response := util.ResponseSuccess("successfully create new publisher", input)
+// 	return c.JSON(http.StatusOK, response)
+// }
 
 // func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 // 	user_id := middlewares.ExtractTokenUserId(c)
@@ -257,34 +345,45 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 // 	foto, file, err := c.Request().FormFile("file")
 
-// 	response := util.ResponseError("cannot create new author with same name which already exist", nil)
-// 	return c.JSON(http.StatusUnprocessableEntity, response)
+// 	filebyte, err := ioutil.ReadAll(foto)
+// 	if err != nil {
+// 		resp := util.ResponseError("internal error", nil)
+// 		c.JSON(http.StatusInternalServerError, resp)
+// 	}
+
+// 	mime := mimetype.Detect(filebyte)
+// 	if !strings.Index(ExtensionAllowed, mime.Extension()) == -1 {
+// 		response := util.ResponseError("file type is not allowed", nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
 
 // }
 
-func (h *Controller) InserBook(c echo.Context) error {
-	var input models.InputBook
+// func (h *Controller) InsertBook(c echo.Context) error {
+// 	user_id := middlewares.ExtractTokenUserId(c)
 
-	err := c.Bind(&input)
-	if err != nil {
-		response := util.ResponseError("error internal", nil)
-		c.JSON(http.StatusInternalServerError, response)
-	}
+// 	var input models.InputBook
 
-	if input.Title == "" || input.PublishYear == 0 {
-		response := util.ResponseFail("please input name of your book and year of publishment of your book", nil)
-		c.JSON(http.StatusUnprocessableEntity, response)
-	}
+// 	err := c.Bind(&input)
+// 	if err != nil {
+// 		response := util.ResponseError("error internal", nil)
+// 		c.JSON(http.StatusInternalServerError, response)
+// 	}
 
-	if input.CategoryID == 0 {
-		input.CategoryID = 1
-	}
-	if input.AuthorID == 0 {
-		input.AuthorID = 1
-	}
-	if input.PublisherID == 0 {
-		input.PublisherID = 1
-	}
-	response := util.ResponseSuccess("successfully create new publisher", input)
-	return c.JSON(http.StatusOK, response)
-}
+// 	if input.Title == "" || input.PublishYear == 0 {
+// 		response := util.ResponseFail("please input name of your book and year of publishment of your book", nil)
+// 		c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
+
+// 	if input.CategoryID == 0 {
+// 		input.CategoryID = 1
+// 	}
+// 	if input.AuthorID == 0 {
+// 		input.AuthorID = 1
+// 	}
+// 	if input.PublisherID == 0 {
+// 		input.PublisherID = 1
+// 	}
+// 	response := util.ResponseSuccess("successfully create new publisher", input)
+// 	return c.JSON(http.StatusOK, response)
+// }

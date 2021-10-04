@@ -1,0 +1,76 @@
+package book
+
+import "sewabuku/models"
+
+func FormatResponseBook(input models.BookData) Formatter {
+	format := Formatter{
+		Available: input.Quantity > 0,
+		ID:        input.ID,
+		Tittle:    input.Tittle,
+		Photo:     input.Photo,
+		Price:     input.Price,
+		Address:   input.User.Address,
+		Author:    input.Author,
+		Publisher: input.Publisher,
+		Category:  input.Category,
+	}
+
+	return format
+
+}
+
+func FormatResponseBooks(books []models.BookData) []Formatter {
+	formatter := []Formatter{}
+	for _, v := range books {
+		formatt := FormatResponseBook(v)
+		formatter = append(formatter, formatt)
+	}
+
+	return formatter
+}
+
+func FormatDetailsBook(input models.BookData) FormatDetails {
+
+	formatter := FormatDetails{
+		ID:          input.ID,
+		Tittle:      input.Tittle,
+		Photo:       input.Photo,
+		PublishYear: input.PublishYear,
+		Quantity:    input.Quantity,
+		Price:       input.Price,
+		Description: input.Description,
+		Name:        input.User.Name,
+		Address:     input.User.Address,
+		Author:      input.Author,
+		Publisher:   input.Publisher,
+		Category:    input.Category,
+	}
+	return formatter
+}
+
+type Formatter struct {
+	ID        uint             `db:"id" json:"id"`
+	Tittle    string           `db:"tittle" json:"tittle"`
+	Photo     string           `json:"file_foto,omitempty"`
+	Price     uint             `json:"rent_price"`
+	Address   string           `json:"adreess"`
+	Author    models.Author    `db:"authors" json:"authors"`
+	Publisher models.Publisher `db:"publishers" json:"publishers"`
+	Category  models.Category  `db:"categories" json:"categories"`
+	Available bool             `json:"is_available"`
+}
+
+type FormatDetails struct {
+	ID          uint             `json:"id"`
+	Tittle      string           `json:"tittle"`
+	Photo       string           `json:"file_foto"`
+	PublishYear uint             `json:"publish_year"`
+	Quantity    uint             `json:"quantity"`
+	Price       uint             `json:"rent_price"`
+	Description string           `json:"description"`
+	Name        string           `json:"owner_name"`
+	Address     string           `json:"address"`
+	Author      models.Author    `json:"authors"`
+	Publisher   models.Publisher `json:"publishers"`
+	Category    models.Category  `json:"categories"`
+}

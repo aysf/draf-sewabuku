@@ -16,9 +16,13 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	bookGroup.GET("/s/:keyword", bookController.SearchBookController)
 
-	bookGroup.GET("/", bookController.GetAllBooks)
+	bookGroup.GET("/all", bookController.GetAllBooks)
 
 	bookGroup.GET("/category", bookController.GetByCategoryID)
+
+	bookGroup.GET("/author", bookController.GetByAuthorID)
+
+	bookGroup.GET("/publisher", bookController.GetByPublisherID)
 
 	bookGroup.GET("/listauthor", bookController.GetListAuthor)
 
@@ -28,5 +32,11 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	bookGroup.GET("/name", bookController.GetBookByname)
 
-	bookGroup.GET("/", bookController.GetDetailsBook)
+	bookGroup.GET("/details", bookController.GetDetailsBook)
+
+	jwtAuth.POST("/newauthor", bookController.CreateNewAuthor)
+
+	jwtAuth.POST("/newpublisher", bookController.CreateNewPublisher)
+
+	jwtAuth.POST("/borrow", bookController.BorrowBook)
 }

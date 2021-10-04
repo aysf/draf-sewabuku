@@ -3,6 +3,7 @@ module sewabuku
 go 1.16
 
 require (
+	github.com/gabriel-vasile/mimetype v1.3.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.6.1
