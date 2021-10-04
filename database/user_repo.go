@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
@@ -55,11 +54,6 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
-	if user.Name == "" || user.Email == "" || user.Password == "" || user.Address == "" {
-		err := errors.New("ALL FIELD CANNOT EMPTY")
-		return user, err
-	}
-
 	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
 
 	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcryptCost)
@@ -101,11 +95,6 @@ func (g *GormUserModel) GetProfile(userId int) (UserProfile, error) {
 
 	if err := g.db.Raw("SELECT * FROM user_profile WHERE id = ?", userId).Scan(&user).Error; err != nil {
 		return user, err
-
-		//var user models.User
-		//
-		//if err := g.db.Find(&user, userId).Error; err != nil {
-		//	return user, err
 	}
 
 	return user, nil
