@@ -86,17 +86,18 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	c.Bind(&userRequest)
 
 	user := models.User{
-		Name:  userRequest.Name,
-		Email: userRequest.Email,
+		Name:    userRequest.Name,
+		Email:   userRequest.Email,
+		Address: userRequest.Address,
 	}
 
-	newProfile, err := controller.userModel.UpdateProfile(user, userId)
+	_, err := controller.userModel.UpdateProfile(user, userId)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Update User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", newProfile))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", nil))
 }
 
 // UpdatePasswordController is controller for user edit their password
