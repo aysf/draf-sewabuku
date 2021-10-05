@@ -31,10 +31,11 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	}
 
 	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
-		Address:  userRequest.Address,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Password:         userRequest.Password,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.Register(user)
@@ -50,6 +51,10 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
+
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
 
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
@@ -85,10 +90,15 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	var userRequest models.User
 	c.Bind(&userRequest)
 
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
 	user := models.User{
-		Name:    userRequest.Name,
-		Email:   userRequest.Email,
-		Address: userRequest.Address,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.UpdateProfile(user, userId)
@@ -107,7 +117,13 @@ func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if _, err := controller.userModel.UpdatePassword(userRequest, userId); err != nil {
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
+	user := models.User{Password: userRequest.Password}
+
+	if _, err := controller.userModel.UpdatePassword(user, userId); err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Change Password", nil))
 	}
 

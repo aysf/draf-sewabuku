@@ -41,6 +41,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
 	SELECT 	users.id,
 			users.name,
+			users.organization_name,
 			users.email,
 			users.address,
         	accounts.balance
@@ -119,22 +120,6 @@ func (g *GormUserModel) UpdateProfile(newProfile models.User, userId int) (model
 
 	return user, nil
 }
-
-//func (m *GormCustomerModel) Edit(newCustomer Customer, customerId int) (Customer, error) {
-//	var customer Customer
-//	if err := m.db.Find(&customer, "id=?", customerId).Error; err != nil {
-//		return customer, err
-//	}
-//
-//	customer.Name = newCustomer.Name
-//	customer.Email = newCustomer.Email
-//	customer.Password = newCustomer.Password
-//
-//	if err := m.db.Save(&customer).Error; err != nil {
-//		return customer, err
-//	}
-//	return customer, nil
-//}
 
 // UpdatePassword is method to edit user password
 func (g *GormUserModel) UpdatePassword(newPass models.User, userId int) (models.User, error) {
