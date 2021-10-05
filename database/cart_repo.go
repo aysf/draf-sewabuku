@@ -25,6 +25,10 @@ func (g *GormCartModel) Rent(cart models.Cart) (models.Cart, error) {
 		return cart, err
 	}
 
+	if err := g.db.Model(&models.BookData{}).Where("id", cart.BookDataID).Update("quantity = ?", -1).Error; err != nil {
+		return cart, err
+	}
+
 	return cart, nil
 }
 

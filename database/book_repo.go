@@ -38,7 +38,7 @@ type (
 func (r *GormBookModel) GetAllBooks() ([]models.BookData, error) {
 	var books []models.BookData
 
-	querry := `SELECT b.id, b.tittle, b.photo, b.publish_year, b.price, b.quantity, b.description, b.user_id, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id`
+	querry := `SELECT b.id, b.title, b.photo, b.publish_year, b.price, b.quantity, b.description, b.user_id, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id`
 
 	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry).Find(&books).Error
 	if err != nil {
@@ -90,7 +90,28 @@ func (r *GormBookModel) GetListPublisher() ([]models.Publisher, error) {
 func (r *GormBookModel) GetByNameBook(namebook string) ([]models.BookData, error) {
 	var books []models.BookData
 
-	querry := `SELECT b.id, b.tittle, b.photo, b.publish_year, b.price, b.quantity, b.description, b.user_id, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id WHERE b.tittle LIKE ?`
+	querry := `SELECT 
+						b.id, 
+						b.title, 
+						b.photo, 
+						b.publish_year, 
+						b.price, 
+						b.quantity, 
+						b.description, 
+						b.user_id, 
+						u.address as "users.address", 
+						u.name as "users.name", 
+						a.name as "authors.name" ,
+						b.author_id, 
+						p.name as "publishers.name", 
+						publisher_id, 
+						c.name as "categories.name", 
+						category_id 
+				FROM book_data b 
+					JOIN users u ON b.user_id = u.id 
+					JOIN publishers p ON b.publisher_id = p.id 
+					JOIN authors a ON b.author_id = a.id 
+					JOIN categories c ON b.category_id = c.id WHERE b.title LIKE ?`
 
 	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry, "%"+namebook+"%").Find(&books).Error
 	if err != nil {
@@ -322,12 +343,21 @@ func (g GormBookModel) Search(keyword, author, category string) (interface{}, er
 }
 
 func NewBookModel(db *gorm.DB) *GormBookModel {
-	if err := db.Exec(`CREATE VIEW book_catalogs AS
-	SELECT title, publish_year, authors.name AS author, publishers.name as publisher, categories.name as category 
+	if err := db.Exec(`
+	CREATE VIEW book_catalogs AS
+	SELECT 	title, 
+			publish_year, 
+			authors.name AS author, 
+			publishers.name as publisher, 
+			categories.name as category,
+			user_id as owner_id,
+			users.name as owner 
 	FROM book_data
 	LEFT JOIN authors ON authors.id = book_data.author_id
 	LEFT JOIN publishers ON publishers.id = book_data.publisher_id
-	LEFT JOIN categories ON categories.id = category_id`); err != nil {
+	LEFT JOIN categories ON categories.id = category_id
+	LEFT JOIN users ON users.id = user_id;
+	`); err != nil {
 		fmt.Println("there is error during loading trigger after_entries_insert")
 	}
 

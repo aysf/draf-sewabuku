@@ -46,8 +46,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 			users.address,
         	accounts.balance
 	FROM users
-	LEFT JOIN accounts
-	ON users.id = accounts.user_id;
+	LEFT JOIN accounts ON users.id = accounts.user_id;
 	`)
 
 	return &GormUserModel{db: db}

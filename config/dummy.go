@@ -56,7 +56,7 @@ func InsertDumyData(db *gorm.DB) {
 			Title:       "Rumah Seribu Malaikat",
 			UserID:      5,
 			Photo:       "default.jpg",
-			Quantity:    2,
+			Quantity:    1,
 			AuthorID:    5,
 			PublisherID: 3,
 			CategoryID:  5,
