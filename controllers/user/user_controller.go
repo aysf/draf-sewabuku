@@ -51,6 +51,10 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
@@ -85,6 +89,10 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	var userRequest models.User
 	c.Bind(&userRequest)
 
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
 	user := models.User{
 		Name:    userRequest.Name,
 		Email:   userRequest.Email,
@@ -107,7 +115,13 @@ func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if _, err := controller.userModel.UpdatePassword(userRequest, userId); err != nil {
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
+	user := models.User{Password: userRequest.Password}
+
+	if _, err := controller.userModel.UpdatePassword(user, userId); err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Change Password", nil))
 	}
 
