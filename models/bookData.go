@@ -1,12 +1,18 @@
 package models
 
 type BookData struct {
-	ID          uint      `db:"id"`
-	Tittle      string    `db:"tittle"`
-	AuthorID    uint      `db:"author_id" json:"author_id"`
-	PublishYear uint      `db:"publish_year" json:"publish_year"`
-	CategoryID  uint      `db:"category_id" json:"category_id"`
-	PublisherID uint      `db:"publisher_id" json:"publisher_id"`
+	ID          uint   `db:"id"`
+	Tittle      string `db:"tittle"`
+	AuthorID    uint   `db:"author_id" json:"author_id"`
+	PublishYear uint   `db:"publish_year" json:"publish_year"`
+	CategoryID  uint   `db:"category_id" json:"category_id"`
+	PublisherID uint   `db:"publisher_id" json:"publisher_id"`
+	UserID      uint
+	User        User
+	Photo       string
+	Quantity    uint
+	Price       uint
+	Description string
 	Author      Author    `db:"authors" json:"authors"`
 	Publisher   Publisher `db:"publishers" json:"publishers"`
 	Category    Category  `db:"categories" json:"categories"`
