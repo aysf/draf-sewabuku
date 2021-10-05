@@ -26,10 +26,15 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
+	if err := c.Validate(&userRequest); err != nil {
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	}
+
 	user := models.User{
 		Name:     userRequest.Name,
 		Email:    userRequest.Email,
 		Password: userRequest.Password,
+		Address:  userRequest.Address,
 	}
 
 	_, err := controller.userModel.Register(user)
@@ -71,17 +76,7 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get User Profile", nil))
 	}
 
-	response := struct {
-		Name    string
-		Email   string
-		Address string
-	}{
-		Name: user.Name,
-		Email: user.Email,
-		Address: user.Address,
-	}
-
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", response))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
 }
 
 // UpdateUserProfileController is controller for user edit their profile
@@ -91,17 +86,18 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	c.Bind(&userRequest)
 
 	user := models.User{
-		Name:  userRequest.Name,
-		Email: userRequest.Email,
+		Name:    userRequest.Name,
+		Email:   userRequest.Email,
+		Address: userRequest.Address,
 	}
 
-	newProfile, err := controller.userModel.UpdateProfile(user, userId)
+	_, err := controller.userModel.UpdateProfile(user, userId)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Update User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", newProfile))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", nil))
 }
 
 // UpdatePasswordController is controller for user edit their password

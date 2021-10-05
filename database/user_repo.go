@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
@@ -15,10 +14,16 @@ type (
 	GormUserModel struct {
 		db *gorm.DB
 	}
+	UserProfile struct {
+		Name    string `json:"name"`
+		Email   string `json:"email"`
+		Address string `json:"address"`
+		Balance uint   `json:"balance"`
+	}
 	UserModel interface {
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
-		GetProfile(userId int) (models.User, error)
+		GetProfile(userId int) (UserProfile, error)
 		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 	}
@@ -34,7 +39,8 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	VALUES (0, new.id);`)
 
 	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
-	SELECT 	users.name,
+	SELECT 	users.id,
+			users.name,
 			users.email,
 			users.address,
         	accounts.balance
@@ -48,11 +54,6 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 
 // Register is  method to add new user
 func (g *GormUserModel) Register(user models.User) (models.User, error) {
-	if user.Name == "" || user.Email == "" || user.Password == "" {
-		err := errors.New("ALL FIELD CANNOT EMPTY")
-		return user, err
-	}
-
 	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
 
 	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcryptCost)
@@ -89,10 +90,10 @@ func (g *GormUserModel) Login(email, password string) (models.User, error) {
 }
 
 // GetProfile is  method to get user profile
-func (g *GormUserModel) GetProfile(userId int) (models.User, error) {
-	var user models.User
+func (g *GormUserModel) GetProfile(userId int) (UserProfile, error) {
+	var user UserProfile
 
-	if err := g.db.Find(&user, userId).Error; err != nil {
+	if err := g.db.Raw("SELECT * FROM user_profile WHERE id = ?", userId).Scan(&user).Error; err != nil {
 		return user, err
 	}
 
@@ -108,12 +109,32 @@ func (g *GormUserModel) UpdateProfile(newProfile models.User, userId int) (model
 		return user, err
 	}
 
+	user.Name = newProfile.Name
+	user.Email = newProfile.Email
+	user.Address = newProfile.Address
+
 	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
 	}
 
 	return user, nil
 }
+
+//func (m *GormCustomerModel) Edit(newCustomer Customer, customerId int) (Customer, error) {
+//	var customer Customer
+//	if err := m.db.Find(&customer, "id=?", customerId).Error; err != nil {
+//		return customer, err
+//	}
+//
+//	customer.Name = newCustomer.Name
+//	customer.Email = newCustomer.Email
+//	customer.Password = newCustomer.Password
+//
+//	if err := m.db.Save(&customer).Error; err != nil {
+//		return customer, err
+//	}
+//	return customer, nil
+//}
 
 // UpdatePassword is method to edit user password
 func (g *GormUserModel) UpdatePassword(newPass models.User, userId int) (models.User, error) {
