@@ -9,7 +9,6 @@ type Cart struct {
 	DateLoan   time.Time `json:"date_loan" form:"date_loan" gorm:"not null"`
 	DateDue    time.Time `json:"date_due" form:"date_due" gorm:"not null"`
 	DateReturn time.Time `json:"date_return" form:"date_return"`
-	Complete   bool
 	User       User
 	BookData   BookData
 }
