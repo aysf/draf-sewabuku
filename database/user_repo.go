@@ -26,6 +26,7 @@ type (
 		GetProfile(userId int) (UserProfile, error)
 		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
+		Logout(userId int) (models.User, error)
 	}
 )
 
@@ -109,9 +110,21 @@ func (g *GormUserModel) UpdateProfile(newProfile models.User, userId int) (model
 		return user, err
 	}
 
-	user.Name = newProfile.Name
-	user.Email = newProfile.Email
-	user.Address = newProfile.Address
+	if newProfile.Name != "" {
+		user.Name = newProfile.Name
+	}
+
+	if newProfile.OrganizationName != "" {
+		user.OrganizationName = newProfile.OrganizationName
+	}
+
+	if newProfile.Email != "" {
+		user.Email = newProfile.Email
+	}
+
+	if newProfile.Address != "" {
+		user.Address = newProfile.Address
+	}
 
 	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
@@ -134,6 +147,24 @@ func (g *GormUserModel) UpdatePassword(newPass models.User, userId int) (models.
 	passwordEncrypted, _ := bcrypt.GenerateFromPassword([]byte(newPass.Password), bcryptCost)
 
 	user.Password = string(passwordEncrypted)
+
+	if err = g.db.Save(&user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+// Logout is method to user log out
+func (g *GormUserModel) Logout(userId int) (models.User, error) {
+	var user models.User
+	var err error
+
+	if err = g.db.First(&user, userId).Error; err != nil {
+		return user, err
+	}
+
+	user.Token = ""
 
 	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
