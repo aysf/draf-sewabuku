@@ -52,7 +52,7 @@ func (h *Controller) GetAllBooks(c echo.Context) error {
 }
 
 func (h *Controller) GetDetailsBook(c echo.Context) error {
-	id, err := strconv.Atoi(c.QueryParam("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		Response := util.ResponseError("internal error", nil)
@@ -218,6 +218,10 @@ func (h *Controller) GetByPublisherID(c echo.Context) error {
 func (h *Controller) CreateNewPublisher(c echo.Context) error {
 	_ = middlewares.ExtractTokenUserId(c)
 	name := c.FormValue("name")
+	if name == "" {
+		response := util.ResponseError("please input author name", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 	name = strings.ToLower(name)
 	name = strings.TrimSpace(fmt.Sprintf("%v", name))
 
@@ -255,6 +259,10 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	_ = middlewares.ExtractTokenUserId(c)
 	name := c.FormValue("name")
+	if name == "" {
+		response := util.ResponseError("please input author name", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 	name = strings.ToLower(name)
 	name = strings.TrimSpace(fmt.Sprintf("%v", name))
 
@@ -370,7 +378,7 @@ func (h *Controller) InsertBook(c echo.Context) error {
 
 func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 	user_id := middlewares.ExtractTokenUserId(c)
-	bookID, err := strconv.Atoi(c.QueryParam("id"))
+	bookID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return fmt.Errorf("error internal guys")
 	}
@@ -419,7 +427,7 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, resp)
 	}
 
-	fotofileName := fmt.Sprintf("/%d,%s,%s", bookID, file.Filename, mime.Extension())
+	fotofileName := fmt.Sprintf("/%d,%s", bookID, file.Filename)
 	book, err = h.bookModel.UpdatePhoto(fotofileName, bookID)
 	if err != nil {
 		resp := util.ResponseError("internal error", err)
@@ -435,7 +443,15 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 
 	defer targetFile.Close()
 
-	response := util.ResponseSuccess("successfully update book photo", book)
+	getnewbook, err := h.bookModel.GetBookByID(uint(bookID))
+	if err != nil {
+		resp := util.ResponseError("error get book but book's photo has been updated", err)
+		return c.JSON(http.StatusInternalServerError, resp)
+	}
+
+	formatresponse := FormatDetailsBook(getnewbook)
+
+	response := util.ResponseSuccess("successfully update book photo", formatresponse)
 	return c.JSON(http.StatusOK, response)
 
 }
