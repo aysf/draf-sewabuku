@@ -67,7 +67,7 @@ func InsertDumyData(db *gorm.DB) {
 			Tittle:      "The Cruel Prince",
 			UserID:      2,
 			Photo:       ".jpg",
-			Quantity:    4,
+			Quantity:    0,
 			AuthorID:    6,
 			PublisherID: 5,
 			CategoryID:  6,

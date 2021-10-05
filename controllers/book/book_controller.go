@@ -119,7 +119,7 @@ func (h *Controller) GetByCategoryID(c echo.Context) error {
 
 	}
 	if len(books) == 0 {
-		response := util.ResponseFail("there is no book in this category", nil)
+		response := util.ResponseFail("there is no book in this category", books)
 		return c.JSON(http.StatusOK, response)
 	}
 
