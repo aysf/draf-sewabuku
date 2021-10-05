@@ -6,7 +6,7 @@ func FormatResponseBook(input models.BookData) Formatter {
 	format := Formatter{
 		Available: input.Quantity > 0,
 		ID:        input.ID,
-		Tittle:    input.Tittle,
+		Title:     input.Title,
 		Photo:     input.Photo,
 		Price:     input.Price,
 		Address:   input.User.Address,
@@ -33,7 +33,7 @@ func FormatDetailsBook(input models.BookData) FormatDetails {
 
 	formatter := FormatDetails{
 		ID:          input.ID,
-		Tittle:      input.Tittle,
+		Title:       input.Title,
 		Photo:       input.Photo,
 		PublishYear: input.PublishYear,
 		Quantity:    input.Quantity,
@@ -50,7 +50,7 @@ func FormatDetailsBook(input models.BookData) FormatDetails {
 
 type Formatter struct {
 	ID        uint             `db:"id" json:"id"`
-	Tittle    string           `db:"tittle" json:"tittle"`
+	Title     string           `db:"Title" json:"Title"`
 	Photo     string           `json:"file_foto,omitempty"`
 	Price     uint             `json:"rent_price"`
 	Address   string           `json:"adreess"`
@@ -62,7 +62,7 @@ type Formatter struct {
 
 type FormatDetails struct {
 	ID          uint             `json:"id"`
-	Tittle      string           `json:"tittle"`
+	Title       string           `json:"Title"`
 	Photo       string           `json:"file_foto"`
 	PublishYear uint             `json:"publish_year"`
 	Quantity    uint             `json:"quantity"`

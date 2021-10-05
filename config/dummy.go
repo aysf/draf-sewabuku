@@ -31,7 +31,7 @@ func InsertDumyData(db *gorm.DB) {
 
 	var bookData = []models.BookData{
 		{
-			Tittle:      "Rich Dad Poor Dad",
+			Title:       "Rich Dad Poor Dad",
 			UserID:      2,
 			Quantity:    2,
 			Photo:       "default.jpg",
@@ -42,7 +42,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Tittle:      "Kambing Jantan",
+			Title:       "Kambing Jantan",
 			UserID:      4,
 			Photo:       "default.jpg",
 			Quantity:    2,
@@ -53,7 +53,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Tittle:      "Rumah Seribu Malaikat",
+			Title:       "Rumah Seribu Malaikat",
 			UserID:      5,
 			Photo:       "default.jpg",
 			Quantity:    2,
@@ -64,7 +64,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Tittle:      "The Cruel Prince",
+			Title:       "The Cruel Prince",
 			UserID:      2,
 			Photo:       ".jpg",
 			Quantity:    0,
@@ -75,7 +75,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Tittle:      "The Black Box",
+			Title:       "The Black Box",
 			UserID:      1,
 			Quantity:    1,
 			Photo:       ".jpg",
@@ -86,7 +86,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       200,
 		},
 		{
-			Tittle:      "Black Clover",
+			Title:       "Black Clover",
 			UserID:      1,
 			AuthorID:    8,
 			Quantity:    1,
@@ -97,7 +97,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Tittle:      "Langit Bumi",
+			Title:       "Langit Bumi",
 			UserID:      2,
 			Quantity:    1,
 			Photo:       "jpg",
@@ -108,7 +108,7 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       10,
 		},
 		{
-			Tittle:      "Bandung Lautan Api",
+			Title:       "Bandung Lautan Api",
 			UserID:      4,
 			Quantity:    1,
 			Photo:       ".jpg",
@@ -118,7 +118,7 @@ func InsertDumyData(db *gorm.DB) {
 			PublishYear: 2010,
 			Price:       100,
 		}, {
-			Tittle:      "masak",
+			Title:       "masak",
 			UserID:      1,
 			Quantity:    2,
 			Photo:       ".jpg",
@@ -128,7 +128,7 @@ func InsertDumyData(db *gorm.DB) {
 			PublishYear: 2010,
 			Price:       100,
 		}, {
-			Tittle:      "surga yang indah",
+			Title:       "surga yang indah",
 			UserID:      1,
 			Quantity:    1,
 			Photo:       ".jpg",

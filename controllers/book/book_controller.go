@@ -339,7 +339,7 @@ func (h *Controller) InsertBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	if input.Tittle == "" || input.PublishYear == 0 {
+	if input.Title == "" || input.PublishYear == 0 {
 		response := util.ResponseFail("please input name of your book and year of publishment of your book", nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
@@ -355,7 +355,7 @@ func (h *Controller) InsertBook(c echo.Context) error {
 	}
 
 	books := models.BookData{
-		Tittle:      input.Tittle,
+		Title:       input.Title,
 		CategoryID:  input.CategoryID,
 		UserID:      uint(user_id),
 		AuthorID:    input.AuthorID,

@@ -293,11 +293,11 @@ func (r *GormBookModel) BorrowBook(book_id, user_id int) (models.Cart, error) {
 
 func (g GormBookModel) Search(keyword, author, category string) (interface{}, error) {
 	type BookCatalog struct {
-		Title         string
-		PublisherYear uint
-		Author        string
-		Publisher     string
-		Category      string
+		Title       string
+		PublishYear uint
+		Author      string
+		Publisher   string
+		Category    string
 	}
 
 	var result []BookCatalog
@@ -323,7 +323,7 @@ func (g GormBookModel) Search(keyword, author, category string) (interface{}, er
 
 func NewBookModel(db *gorm.DB) *GormBookModel {
 	if err := db.Exec(`CREATE VIEW book_catalogs AS
-	SELECT tittle, publisher_year, authors.name AS author, publishers.name as publisher, categories.name as category 
+	SELECT title, publish_year, authors.name AS author, publishers.name as publisher, categories.name as category 
 	FROM book_data
 	LEFT JOIN authors ON authors.id = book_data.author_id
 	LEFT JOIN publishers ON publishers.id = book_data.publisher_id

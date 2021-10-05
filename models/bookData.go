@@ -2,7 +2,7 @@ package models
 
 type BookData struct {
 	ID          uint      `db:"id" json:"id"`
-	Tittle      string    `db:"tittle" json:"tittle"`
+	Title       string    `db:"tittle" json:"tittle"`
 	Photo       string    `json:"file_foto,omitempty"`
 	PublishYear uint      `db:"publish_year" json:"publish_year,omitempty"`
 	Quantity    uint      `json:"quantity"`
@@ -34,7 +34,7 @@ type Category struct {
 }
 
 type InputBook struct {
-	Tittle      string `json:"tittle"`
+	Title       string `json:"Title"`
 	CategoryID  uint   `json:"category_id"`
 	AuthorID    uint   `json:"author_id"`
 	PublisherID uint   `json:"publisher_id"`

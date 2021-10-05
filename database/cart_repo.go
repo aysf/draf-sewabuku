@@ -73,12 +73,12 @@ func NewCartModel(db *gorm.DB) *GormCartModel {
 	CREATE TRIGGER after_cart_insert_lender
 	AFTER INSERT ON carts
 	FOR EACH ROW
-	INSERT INTO entries (account_id, amount, created_at) VALUES ((select user_id from book_users where book_users.id = new.book_user_id), DATEDIFF(new.date_due, new.date_loan) * (select rent_price from book_users where book_users.id = new.book_user_id), now()); `)
+	INSERT INTO entries (account_id, amount, created_at) VALUES ((select user_id from book_data where book_data.id = new.book_data_id), DATEDIFF(new.date_due, new.date_loan) * (select price from book_data where book_data.id = new.book_data_id), now()); `)
 
 	db.Exec(`
 	CREATE TRIGGER after_cart_insert_borrower
 	AFTER INSERT ON carts
 	FOR EACH ROW
-	INSERT INTO entries (account_id, amount, created_at) VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(rent_price AS SIGNED) from book_users where book_users.id = new.book_user_id), now());`)
+	INSERT INTO entries (account_id, amount, created_at) VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(price AS SIGNED) from book_data where book_data.id = new.book_data_id), now());`)
 	return &GormCartModel{db: db}
 }
