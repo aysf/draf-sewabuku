@@ -41,6 +41,7 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
 	SELECT 	users.id,
 			users.name,
+			users.organization_name,
 			users.email,
 			users.address,
         	accounts.balance
