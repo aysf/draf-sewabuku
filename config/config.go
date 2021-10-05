@@ -47,6 +47,7 @@ func DBMigrate(db *gorm.DB) {
 	db.Migrator().DropTable(&models.Account{})
 	db.Migrator().DropTable(&models.Transfers{})
 	db.Migrator().DropTable(&models.Entry{})
+	db.Migrator().DropTable(&models.Rating{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Cart{})
 	db.AutoMigrate(&models.BookData{})
@@ -56,6 +57,7 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Account{})
 	db.AutoMigrate(&models.Transfers{})
 	db.AutoMigrate(&models.Entry{})
+	db.AutoMigrate(&models.Rating{})
 
 }
 

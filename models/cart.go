@@ -12,3 +12,14 @@ type Cart struct {
 	User       User
 	BookData   BookData
 }
+
+type Rating struct {
+	ID           uint `gorm:"primaryKey"`
+	CartID       uint
+	RateBook     float32
+	DescRateBook string
+	RateUser     float32
+	DescRateUser string
+	CreatedAt    time.Time
+	Cart         Cart
+}

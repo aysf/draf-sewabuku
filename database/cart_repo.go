@@ -55,11 +55,10 @@ func (g *GormCartModel) List(userId int) (interface{}, error) {
 
 	type CartView struct {
 		ID         uint
-		BookUserID uint
+		BookDataID uint
 		DateLoan   time.Time
 		DateDue    time.Time
 		DateReturn time.Time
-		IsReturn   bool
 	}
 
 	var carts []CartView
