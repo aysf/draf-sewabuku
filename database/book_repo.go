@@ -282,7 +282,7 @@ func (r *GormBookModel) BorrowBook(book_id, user_id int) (models.Cart, error) {
 		return cart, err
 	}
 
-	err = r.db.Model(&models.BookData{}).Where("id", book_id).Update("quantity", -1).Error
+	err = r.db.Model(&models.BookData{}).Where("id", book_id).Update("quantity = ?", -1).Error
 	if err != nil {
 		return cart, err
 	}
