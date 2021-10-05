@@ -95,9 +95,10 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	}
 
 	user := models.User{
-		Name:    userRequest.Name,
-		Email:   userRequest.Email,
-		Address: userRequest.Address,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.UpdateProfile(user, userId)
