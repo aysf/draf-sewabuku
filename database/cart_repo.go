@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"sewabuku/models"
 	"time"
 
@@ -35,6 +36,10 @@ func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (models.Cart,
 	tx := g.db.Where("user_id = ? AND book_data_id = ?", userId, bookId).Find(&cart)
 	if tx.Error != nil {
 		return cart, tx.Error
+	}
+	var nullTime time.Time
+	if cart.DateReturn != nullTime {
+		return cart, errors.New("book already returned")
 	}
 
 	if err := g.db.Model(&cart).Update("date_return", Date).Error; err != nil {
