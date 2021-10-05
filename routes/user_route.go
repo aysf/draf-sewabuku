@@ -22,4 +22,6 @@ func UserPath(e *echo.Echo, userController *user.Controller) {
 	jwtAuth.PUT("/profile", userController.UpdateUserProfileController)
 
 	jwtAuth.PUT("/change-password", userController.UpdatePasswordController)
+
+	jwtAuth.PUT("/logout", userController.LogoutUserController)
 }
