@@ -1,13 +1,12 @@
 package database
 
 import (
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
-
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type (
@@ -20,6 +19,17 @@ type (
 		Address string `json:"address"`
 		Balance uint   `json:"balance"`
 	}
+	Borrowed []struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+		Author      string `json:"author"`
+		Publisher   string `json:"publisher"`
+		PublishYear uint   `json:"publish_year"`
+		Photo       string `json:"photo"`
+		Price       uint   `json:"price"`
+		Owner       string `json:"owner"`
+	}
 	UserModel interface {
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
@@ -27,6 +37,7 @@ type (
 		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 		Logout(userId int) (models.User, error)
+		GetBorrowed(userId int) (Borrowed, error)
 	}
 )
 
@@ -47,8 +58,25 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 			users.address,
         	accounts.balance
 	FROM users
-	LEFT JOIN accounts ON users.id = accounts.user_id;
-	`)
+	LEFT JOIN accounts ON users.id = accounts.user_id;`)
+
+	db.Exec(`CREATE VIEW borrowed AS
+	SELECT carts.user_id,
+		title,
+		description,
+		categories.name AS category,
+		authors.name    AS author,
+		publishers.name AS publisher,
+		publish_year,
+		photo,
+		price,
+		users.name      AS owner
+	FROM book_data
+	LEFT JOIN dbbaru.carts ON book_data.id = carts.book_data_id
+	LEFT JOIN categories ON book_data.category_id = categories.id
+	LEFT JOIN authors ON book_data.author_id = authors.id
+	LEFT JOIN publishers ON book_data.publisher_id = publishers.id
+	LEFT JOIN users ON book_data.user_id = users.id;`)
 
 	return &GormUserModel{db: db}
 }
@@ -167,6 +195,17 @@ func (g *GormUserModel) Logout(userId int) (models.User, error) {
 	user.Token = ""
 
 	if err = g.db.Save(&user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+// GetBorrowed is method for get borrowed book
+func (g *GormUserModel) GetBorrowed(userId int) (Borrowed, error) {
+	var user Borrowed
+
+	if err := g.db.Raw("SELECT * FROM borrowed WHERE user_id = ?", userId).Scan(&user).Error; err != nil {
 		return user, err
 	}
 

@@ -111,7 +111,7 @@ func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Change Password", nil))
 }
 
-// LogoutUserController is controller for user login
+// LogoutUserController is controller for user log out
 func (controller *Controller) LogoutUserController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
@@ -122,4 +122,17 @@ func (controller *Controller) LogoutUserController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Logout Success", nil))
+}
+
+// GetBorrowedController is controller for get borrowed book
+func (controller *Controller) GetBorrowedController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	user, err := controller.userModel.GetBorrowed(userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Borrowed Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Borrowed Book", user))
 }
