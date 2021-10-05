@@ -12,3 +12,13 @@ type Cart struct {
 	User       User
 	BookData   BookData
 }
+
+type Rating struct {
+	ID               uint `gorm:"primaryKey"`
+	CartID           uint
+	RateBook         float32 `json:"rate_book" form:"rate_book" gorm:"not null"`
+	RateBorrower     float32 `json:"rate_borrower" form:"rate_borrower" gorm:"not null"`
+	DescRateBook     string  `json:"desc_rate_book" form:"desc_rate_book" gorm:"not null"`
+	DescRateBorrower string  `json:"desc_rate_borrower" form:"desc_rate_borrower" gorm:"not null"`
+	Cart             Cart
+}
