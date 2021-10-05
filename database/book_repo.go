@@ -303,11 +303,6 @@ func (r *GormBookModel) BorrowBook(book_id, user_id int) (models.Cart, error) {
 		return cart, err
 	}
 
-	err = r.db.Model(&models.BookData{}).Where("id", book_id).Update("quantity = ?", -1).Error
-	if err != nil {
-		return cart, err
-	}
-
 	return cart, nil
 
 }
@@ -351,7 +346,8 @@ func NewBookModel(db *gorm.DB) *GormBookModel {
 			publishers.name as publisher, 
 			categories.name as category,
 			user_id as owner_id,
-			users.name as owner 
+			users.name as owner,
+			quantity 
 	FROM book_data
 	LEFT JOIN authors ON authors.id = book_data.author_id
 	LEFT JOIN publishers ON publishers.id = book_data.publisher_id

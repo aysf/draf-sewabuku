@@ -25,10 +25,6 @@ func (g *GormCartModel) Rent(cart models.Cart) (models.Cart, error) {
 		return cart, err
 	}
 
-	if err := g.db.Model(&models.BookData{}).Where("id", cart.BookDataID).Update("quantity = ?", -1).Error; err != nil {
-		return cart, err
-	}
-
 	return cart, nil
 }
 
@@ -36,7 +32,7 @@ func (g *GormCartModel) Rent(cart models.Cart) (models.Cart, error) {
 func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (models.Cart, error) {
 	var cart models.Cart
 
-	tx := g.db.Where("user_id = ? AND book_user_id = ?", userId, bookId).Find(&cart)
+	tx := g.db.Where("user_id = ? AND book_data_id = ?", userId, bookId).Find(&cart)
 	if tx.Error != nil {
 		return cart, tx.Error
 	}
@@ -84,5 +80,22 @@ func NewCartModel(db *gorm.DB) *GormCartModel {
 	AFTER INSERT ON carts
 	FOR EACH ROW
 	INSERT INTO entries (account_id, amount, created_at) VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(price AS SIGNED) from book_data where book_data.id = new.book_data_id), now());`)
+
+	db.Exec(`
+	CREATE TRIGGER qty_after_rent
+	AFTER INSERT on carts
+	for each row 
+		update book_data set quantity = quantity - 1
+		where book_data.id = new.book_data_id;
+	`)
+
+	db.Exec(`
+	CREATE TRIGGER qty_after_return
+	AFTER UPDATE on carts
+	for each row 
+		update book_data set quantity = quantity + 1
+		where book_data.id = new.book_data_id;
+	`)
+
 	return &GormCartModel{db: db}
 }
