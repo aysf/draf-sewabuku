@@ -31,10 +31,11 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	}
 
 	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
-		Address:  userRequest.Address,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Password:         userRequest.Password,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.Register(user)
