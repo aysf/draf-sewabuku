@@ -30,6 +30,17 @@ type (
 		Price       uint   `json:"price"`
 		Owner       string `json:"owner"`
 	}
+	Lent []struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+		Author      string `json:"author"`
+		Publisher   string `json:"publisher"`
+		PublishYear uint   `json:"publish_year"`
+		Photo       string `json:"photo"`
+		Price       uint   `json:"price"`
+		Borrower    string `json:"borrower"`
+	}
 	UserModel interface {
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
@@ -38,6 +49,7 @@ type (
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 		Logout(userId int) (models.User, error)
 		GetBorrowed(userId int) (Borrowed, error)
+		GetLent(userId int) (Lent, error)
 	}
 )
 
@@ -60,23 +72,43 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 	FROM users
 	LEFT JOIN accounts ON users.id = accounts.user_id;`)
 
-	db.Exec(`CREATE VIEW borrowed AS
-	SELECT carts.user_id,
-		title,
-		description,
-		categories.name AS category,
-		authors.name    AS author,
-		publishers.name AS publisher,
-		publish_year,
-		photo,
-		price,
-		users.name      AS owner
+	db.Exec(`CREATE OR REPLACE VIEW borrowed AS
+	SELECT carts.user_id   AS borrower_id,
+	       title,
+	       description,
+	       categories.name AS category,
+	       authors.name    AS author,
+	       publishers.name AS publisher,
+	       publish_year,
+	       photo,
+	       price,
+	       users.name      AS owner
 	FROM book_data
-	LEFT JOIN dbbaru.carts ON book_data.id = carts.book_data_id
-	LEFT JOIN categories ON book_data.category_id = categories.id
-	LEFT JOIN authors ON book_data.author_id = authors.id
-	LEFT JOIN publishers ON book_data.publisher_id = publishers.id
-	LEFT JOIN users ON book_data.user_id = users.id;`)
+	         LEFT JOIN carts ON book_data.id = carts.book_data_id
+	         LEFT JOIN categories ON book_data.category_id = categories.id
+	         LEFT JOIN authors ON book_data.author_id = authors.id
+	         LEFT JOIN publishers ON book_data.publisher_id = publishers.id
+	         LEFT JOIN users ON book_data.user_id = users.id
+	WHERE carts.user_id IS NOT NULL;`)
+
+	db.Exec(`CREATE OR REPLACE VIEW lent AS
+	SELECT book_data.user_id AS owner_id,
+	       title,
+	       description,
+	       categories.name   AS category,
+	       authors.name      AS author,
+	       publishers.name   AS publisher,
+	       publish_year,
+	       photo,
+	       price,
+	       users.name        AS borrower
+	FROM book_data
+	         LEFT JOIN carts ON book_data.id = carts.book_data_id
+	         LEFT JOIN categories ON book_data.category_id = categories.id
+	         LEFT JOIN authors ON book_data.author_id = authors.id
+	         LEFT JOIN publishers ON book_data.publisher_id = publishers.id
+	         LEFT JOIN users ON carts.user_id = users.id
+	WHERE users.name IS NOT NULL;`)
 
 	return &GormUserModel{db: db}
 }
@@ -205,7 +237,18 @@ func (g *GormUserModel) Logout(userId int) (models.User, error) {
 func (g *GormUserModel) GetBorrowed(userId int) (Borrowed, error) {
 	var user Borrowed
 
-	if err := g.db.Raw("SELECT * FROM borrowed WHERE user_id = ?", userId).Scan(&user).Error; err != nil {
+	if err := g.db.Raw("SELECT * FROM borrowed WHERE borrower_id = ?", userId).Scan(&user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+// GetLent is method for get lent book
+func (g *GormUserModel) GetLent(userId int) (Lent, error) {
+	var user Lent
+
+	if err := g.db.Raw("SELECT * FROM lent WHERE owner_id = ?", userId).Scan(&user).Error; err != nil {
 		return user, err
 	}
 

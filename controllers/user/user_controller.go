@@ -136,3 +136,16 @@ func (controller *Controller) GetBorrowedController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Borrowed Book", user))
 }
+
+// GetLentController is controller for get borrowed book
+func (controller *Controller) GetLentController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	user, err := controller.userModel.GetLent(userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Lent Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Lent Book", user))
+}

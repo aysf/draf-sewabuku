@@ -26,4 +26,6 @@ func UserPath(e *echo.Echo, userController *user.Controller) {
 	jwtAuth.PUT("/logout", userController.LogoutUserController)
 
 	jwtAuth.GET("/borrowed", userController.GetBorrowedController)
+
+	jwtAuth.GET("/lent", userController.GetLentController)
 }
