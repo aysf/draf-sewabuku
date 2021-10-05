@@ -8,6 +8,6 @@ type User struct {
 	Email     string    `json:"email" form:"email" gorm:"unique;not null" validate:"required,email"`
 	Password  string    `json:"password" form:"password" gorm:"not null" validate:"required"`
 	Address   string    `json:"address" form:"address" gorm:"default:none"`
-	Token     string    `json:"token"`
+	Token     string    `json:"token,omitempty"`
 	CreatedAt time.Time `json:"-"`
 }

@@ -29,7 +29,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 	cart := models.Cart{
 		UserID:     uint(userId),
-		BookUserID: uint(cartRequest.BookUserID),
+		BookDataID: uint(cartRequest.BookDataID),
 		DateLoan:   cartRequest.DateLoan,
 		DateDue:    cartRequest.DateDue,
 	}
@@ -52,7 +52,7 @@ func (controller *Controller) ReturnBook(c echo.Context) error {
 		DateReturn: Date.DateReturn,
 	}
 
-	returnBook, err := controller.cartModel.Return(updateDate.DateReturn, userId, int(Date.BookUserID))
+	returnBook, err := controller.cartModel.Return(updateDate.DateReturn, userId, int(Date.BookDataID))
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Return Book", nil))

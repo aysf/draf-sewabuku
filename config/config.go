@@ -40,7 +40,6 @@ func DBConnect() *gorm.DB {
 func DBMigrate(db *gorm.DB) {
 	db.Migrator().DropTable(&models.User{})
 	db.Migrator().DropTable(&models.Cart{})
-	db.Migrator().DropTable(&models.BookUser{})
 	db.Migrator().DropTable(&models.BookData{})
 	db.Migrator().DropTable(&models.Author{})
 	db.Migrator().DropTable(&models.Category{})
@@ -50,7 +49,6 @@ func DBMigrate(db *gorm.DB) {
 	db.Migrator().DropTable(&models.Entry{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Cart{})
-	db.AutoMigrate(&models.BookUser{})
 	db.AutoMigrate(&models.BookData{})
 	db.AutoMigrate(&models.Author{})
 	db.AutoMigrate(&models.Category{})
