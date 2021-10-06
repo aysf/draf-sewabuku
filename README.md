@@ -1,3 +1,7 @@
+# sewabuku
+
+![Sewabuku – Lent and Borrow Book API](https://github.com/)
+
 ## Getting Strated
 
 add `.env` file in the root repository, for example:
