@@ -12,7 +12,6 @@ import (
 	"sewabuku/util"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/labstack/echo/v4"
@@ -219,44 +218,44 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h *Controller) BorrowBook(c echo.Context) error {
-	user_id := middlewares.ExtractTokenUserId(c)
-	var input models.InputBorrow
-	c.Bind(&input)
+// func (h *Controller) BorrowBook(c echo.Context) error {
+// 	user_id := middlewares.ExtractTokenUserId(c)
+// 	var input models.InputBorrow
+// 	c.Bind(&input)
 
-	if input.DateDue == time.Now() || input.DateReturn == time.Now() {
-		response := util.ResponseFail("please input date to return this book ", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+// 	if input.DateDue == time.Now() || input.DateReturn == time.Now() {
+// 		response := util.ResponseFail("please input date to return this book ", nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
 
-	check, err := h.bookModel.GetBookByID(input.BookDataID)
-	if err != nil {
-		response := util.ResponseError("failed", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
-	if check.Quantity == 0 {
-		response := util.ResponseFail("sorry someone is borrowing this book, please wait until it gets returned ", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+// 	check, err := h.bookModel.GetBookByID(input.BookDataID)
+// 	if err != nil {
+// 		response := util.ResponseError("failed", nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
+// 	if check.Quantity == 0 {
+// 		response := util.ResponseFail("sorry someone is borrowing this book, please wait until it gets returned ", nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
 
-	cart := models.Cart{
-		UserID:     uint(user_id),
-		BookDataID: input.BookDataID,
-		DateLoan:   time.Now(),
-		DateDue:    input.DateDue,
-		DateReturn: input.DateReturn,
-	}
+// 	cart := models.Cart{
+// 		UserID:     uint(user_id),
+// 		BookDataID: input.BookDataID,
+// 		DateLoan:   time.Now(),
+// 		DateDue:    input.DateDue,
+// 		DateReturn: input.DateReturn,
+// 	}
 
-	carts, err := h.bookModel.BorrowBook(cart)
-	if err != nil {
-		response := util.ResponseError("failed to borrow book", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+// 	carts, err := h.bookModel.BorrowBook(cart)
+// 	if err != nil {
+// 		response := util.ResponseError("failed to borrow book", nil)
+// 		return c.JSON(http.StatusUnprocessableEntity, response)
+// 	}
 
-	response := util.ResponseSuccess("successfully asking for borrow books", carts)
-	return c.JSON(http.StatusOK, response)
+// 	response := util.ResponseSuccess("successfully asking for borrow books", carts)
+// 	return c.JSON(http.StatusOK, response)
 
-}
+// }
 
 func (h *Controller) InsertBook(c echo.Context) error {
 	user_id := middlewares.ExtractTokenUserId(c)

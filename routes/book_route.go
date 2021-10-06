@@ -32,8 +32,6 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	jwtAuth.POST("/newpublisher", bookController.CreateNewPublisher)
 
-	jwtAuth.POST("/borrow", bookController.BorrowBook)
-
 	jwtAuth.PUT("/bookphoto/:id", bookController.UpdatePhotoBook)
 
 	jwtAuth.POST("/newbook", bookController.InsertBook)

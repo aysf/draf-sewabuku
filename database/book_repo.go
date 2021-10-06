@@ -120,6 +120,14 @@ func (r *GormBookModel) GetBookByID(id uint) (models.BookData, error) {
 		return book, err
 	}
 
+	querry2 := `SELECT AVG(rate_book) rate FROM rating r WHERE book_data_id = ?`
+	var rate float32
+	err = r.db.Raw(querry2, id).Find(&rate).Error
+	if err != nil {
+		return book, nil
+	}
+	book.Rating = rate
+
 	return book, nil
 }
 
@@ -288,13 +296,24 @@ func (r *GormBookModel) BorrowBook(cart models.Cart) (models.Cart, error) {
 }
 
 func NewBookModel(db *gorm.DB) *GormBookModel {
-	if err := db.Exec(`CREATE OR REPLACE VIEW book_catalogs AS
+	err := db.Exec(`CREATE OR REPLACE VIEW book_catalogs AS
 	SELECT bd.id as id, bd.title as title, bd.description as description , bd.price as price, bd.photo as photo, bd.quantity as quantity , bd.publish_year as publish_year, bd.publisher_id as publisher_id , bd.author_id as author_id , bd.category_id as category_id ,a.name AS author, p.name as publisher, c.name as category, u.id as user_id, u.address as address, u.name as name
 	FROM book_data bd 
 	LEFT JOIN authors a ON a.id = bd.author_id
 	LEFT JOIN publishers p ON p.id = bd.publisher_id
 	LEFT JOIN categories c ON c.id = bd.category_id
-	LEFT JOIN  users u ON bd.user_id = u.id`).Error; err != nil {
+	LEFT JOIN  users u ON bd.user_id = u.id`).Error
+	if err != nil {
+		fmt.Println("masih errorrrrr disni")
+		panic(err)
+	}
+
+	err1 := db.Exec(`CREATE OR REPLACE VIEW rating AS
+	SELECT b.id AS book_data_id, r.rate_book AS rate_book from book_data b
+	LEFT JOIN carts c on b.id = c.book_data_id
+	LEFT JOIN ratings r on c.id = r.cart_id`).Error
+
+	if err1 != nil {
 		fmt.Println("masih errorrrrr disni")
 		panic(err)
 	}

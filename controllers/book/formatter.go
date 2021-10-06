@@ -38,6 +38,7 @@ func FormatDetailsBook(input models.BookData) FormatDetails {
 		PublishYear: input.PublishYear,
 		Quantity:    input.Quantity,
 		Price:       input.Price,
+		Rating:      input.Rating,
 		Description: input.Description,
 		Name:        input.User.Name,
 		Address:     input.User.Address,
@@ -67,6 +68,7 @@ type FormatDetails struct {
 	PublishYear uint             `json:"publish_year"`
 	Quantity    uint             `json:"quantity"`
 	Price       uint             `json:"rent_price"`
+	Rating      float32          `json:"rating"`
 	Description string           `json:"description"`
 	Name        string           `json:"owner_name"`
 	Address     string           `json:"address"`
