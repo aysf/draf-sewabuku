@@ -2,6 +2,7 @@ package config
 
 import (
 	"sewabuku/models"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -23,6 +24,16 @@ func InsertDumyData(db *gorm.DB) {
 		{Name: "kokoh", Email: "kooko@.com", Password: passStr, Address: "cikarang"},
 		{Name: "Saness", Email: "saneess@gmail.", Password: passStr, Address: "surabaya"},
 		{Name: "kokoh", Email: "koiooako@.com", Password: passStr, Address: "palembang"},
+	}
+
+	// ----------------
+	// entry - add balance
+	// ----------------
+
+	var entry = []models.Entry{
+		{AccountID: 2, Amount: 25000, CreatedAt: time.Now()},
+		{AccountID: 4, Amount: 50000, CreatedAt: time.Now()},
+		{AccountID: 6, Amount: 75000, CreatedAt: time.Now()},
 	}
 
 	// ----------------
@@ -188,20 +199,8 @@ func InsertDumyData(db *gorm.DB) {
 	// Book User mock
 	// ----------------
 
-	// var BookUser = []models.BookUser{
-	// 	{BookDataID: 1, UserID: 1, RentPrice: 1500, Quantity: 1, FileFoto: "default.jpg"},
-	// 	{BookDataID: 2, UserID: 2, RentPrice: 1200, Quantity: 2, FileFoto: "default.jpg"},
-	// 	{BookDataID: 3, UserID: 1, RentPrice: 2400, Quantity: 1, FileFoto: "default.jpg"},
-	// 	{BookDataID: 4, UserID: 4, RentPrice: 1000, Quantity: 5, FileFoto: "default.jpg"},
-	// 	{BookDataID: 5, UserID: 5, RentPrice: 1000, Quantity: 6, FileFoto: "default.jpg"},
-	// 	{BookDataID: 6, UserID: 7, RentPrice: 500, Quantity: 7, FileFoto: "default.jpg"},
-	// 	{BookDataID: 7, UserID: 5, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
-	// 	{BookDataID: 8, UserID: 4, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
-	// 	{BookDataID: 9, UserID: 3, RentPrice: 1000, Quantity: 3, FileFoto: "default.jpg"},
-	// 	{BookDataID: 10, UserID: 1, RentPrice: 200, Quantity: 2, FileFoto: "default.jpg"},
-	// }
-
 	db.Create(&User)
+	db.Create(&entry)
 	db.Create(&Category)
 	db.Create(&Author)
 	db.Create(&Publisher)
