@@ -1,6 +1,6 @@
 # sewabuku
 
-![Sewabuku – Lent and Borrow Book API](https://github.com/)
+![Sewabuku – Lent and Borrow Book API](https://raw.githubusercontent.com/tegarap/sewabuku-doc-assets/main/banner.png)
 
 ## Getting Strated
 
