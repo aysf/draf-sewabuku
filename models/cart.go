@@ -14,14 +14,13 @@ type Cart struct {
 }
 
 type Rating struct {
-	ID           uint `gorm:"primaryKey"`
-	CartID       uint
-	RateBook     float32
-	DescRateBook string
-	RateUser     float32
-	DescRateUser string
-	CreatedAt    time.Time
-	Cart         Cart
+	ID               uint `gorm:"primaryKey"`
+	CartID           uint
+	RateBook         float32 `json:"rate_book" form:"rate_book" gorm:"not null;default:0.0"`
+	RateBorrower     float32 `json:"rate_borrower" form:"rate_borrower" gorm:"not null;default:0.0"`
+	DescRateBook     string  `json:"desc_rate_book" form:"desc_rate_book"`
+	DescRateBorrower string  `json:"desc_rate_borrower" form:"desc_rate_borrower"`
+	Cart             Cart
 }
 
 type InputBorrow struct {

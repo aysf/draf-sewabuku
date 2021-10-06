@@ -38,7 +38,7 @@ func main() {
 	accountModel := database.NewAccountModel(db)
 	cartModel := database.NewCartModel(db)
 
-	// config.InsertDumyData(db)
+	config.InsertDumyData(db)
 
 	// Initialize controller
 	newUserController := user.NewController(userModel)
