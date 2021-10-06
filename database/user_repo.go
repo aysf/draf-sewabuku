@@ -1,13 +1,12 @@
 package database
 
 import (
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
-
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type (
@@ -20,6 +19,34 @@ type (
 		Address string `json:"address"`
 		Balance uint   `json:"balance"`
 	}
+	Borrowed []struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+		Author      string `json:"author"`
+		Publisher   string `json:"publisher"`
+		PublishYear uint   `json:"publish_year"`
+		Photo       string `json:"photo"`
+		Price       uint   `json:"price"`
+		Owner       string `json:"owner"`
+		DateLoan    string `json:"date_loan"`
+		DateDue     string `json:"date_due"`
+		DateReturn  string `json:"date_return"`
+	}
+	Lent []struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+		Author      string `json:"author"`
+		Publisher   string `json:"publisher"`
+		PublishYear uint   `json:"publish_year"`
+		Photo       string `json:"photo"`
+		Price       uint   `json:"price"`
+		Borrower    string `json:"borrower"`
+		DateLoan    string `json:"date_loan"`
+		DateDue     string `json:"date_due"`
+		DateReturn  string `json:"date_return"`
+	}
 	UserModel interface {
 		Register(user models.User) (models.User, error)
 		Login(email, password string) (models.User, error)
@@ -27,6 +54,8 @@ type (
 		UpdateProfile(newProfile models.User, userId int) (models.User, error)
 		UpdatePassword(newPass models.User, userId int) (models.User, error)
 		Logout(userId int) (models.User, error)
+		GetBorrowed(userId int, complete string) (Borrowed, error)
+		GetLent(userId int, complete string) (Lent, error)
 	}
 )
 
@@ -47,8 +76,32 @@ func NewUserModel(db *gorm.DB) *GormUserModel {
 			users.address,
         	accounts.balance
 	FROM users
-	LEFT JOIN accounts ON users.id = accounts.user_id;
-	`)
+	LEFT JOIN accounts ON users.id = accounts.user_id;`)
+
+	db.Exec(`CREATE OR REPLACE VIEW book_history AS
+	SELECT book_data.user_id AS owner_id,
+	       lender.name       AS owner,
+	       title,
+	       description,
+	       categories.name   AS category,
+	       authors.name      AS author,
+	       publishers.name   AS publisher,
+	       publish_year,
+	       photo,
+	       price,
+	       carts.user_id     AS borrower_id,
+	       borrower.name     AS borrower,
+	       date_loan,
+	       date_due,
+	       date_return
+	FROM book_data
+	         LEFT JOIN carts ON book_data.id = carts.book_data_id
+	         LEFT JOIN categories ON book_data.category_id = categories.id
+	         LEFT JOIN authors ON book_data.author_id = authors.id
+	         LEFT JOIN publishers ON book_data.publisher_id = publishers.id
+	         LEFT JOIN users AS lender ON book_data.user_id = lender.id
+	         LEFT JOIN users AS borrower ON carts.user_id = borrower.id
+	WHERE carts.user_id IS NOT NULL;`)
 
 	return &GormUserModel{db: db}
 }
@@ -168,6 +221,46 @@ func (g *GormUserModel) Logout(userId int) (models.User, error) {
 
 	if err = g.db.Save(&user).Error; err != nil {
 		return user, err
+	}
+
+	return user, nil
+}
+
+// GetBorrowed is method for get borrowed book
+func (g *GormUserModel) GetBorrowed(userId int, complete string) (Borrowed, error) {
+	var user Borrowed
+	var err *gorm.DB
+
+	if complete == "true" {
+		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return IS NOT NULL", userId).Scan(&user)
+	} else if complete == "false" {
+		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return IS NULL", userId).Scan(&user)
+	} else {
+		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ?", userId).Scan(&user)
+	}
+
+	if err.Error != nil {
+		return user, err.Error
+	}
+
+	return user, nil
+}
+
+// GetLent is method for get lent book
+func (g *GormUserModel) GetLent(userId int, complete string) (Lent, error) {
+	var user Lent
+	var err *gorm.DB
+
+	if complete == "true" {
+		err = g.db.Raw("SELECT * FROM book_history WHERE owner_id = ? AND date_return IS NOT NULL", userId).Scan(&user)
+	} else if complete == "false" {
+		err = g.db.Raw("SELECT * FROM book_history WHERE owner_id = ? AND date_return IS NULL", userId).Scan(&user)
+	} else {
+		err = g.db.Raw("SELECT * FROM book_history WHERE owner_id = ?", userId).Scan(&user)
+	}
+
+	if err.Error != nil {
+		return user, err.Error
 	}
 
 	return user, nil
