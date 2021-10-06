@@ -128,7 +128,6 @@ func (controller *Controller) LogoutUserController(c echo.Context) error {
 func (controller *Controller) GetBorrowedController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
-	//complete := c.QueryParam("complete")
 	complete := c.QueryParam("complete")
 
 	user, err := controller.userModel.GetBorrowed(userId, complete)
