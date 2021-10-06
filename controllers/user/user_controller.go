@@ -128,7 +128,10 @@ func (controller *Controller) LogoutUserController(c echo.Context) error {
 func (controller *Controller) GetBorrowedController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
-	user, err := controller.userModel.GetBorrowed(userId)
+	//complete := c.QueryParam("complete")
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetBorrowed(userId, complete)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Borrowed Book", nil))
@@ -141,7 +144,9 @@ func (controller *Controller) GetBorrowedController(c echo.Context) error {
 func (controller *Controller) GetLentController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
-	user, err := controller.userModel.GetLent(userId)
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetLent(userId, complete)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Lent Book", nil))
