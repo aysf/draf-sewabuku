@@ -53,7 +53,7 @@ type Formatter struct {
 	Title     string           `db:"Title" json:"Title"`
 	Photo     string           `json:"file_foto,omitempty"`
 	Price     uint             `json:"rent_price"`
-	Address   string           `json:"adreess"`
+	Address   string           `json:"address"`
 	Author    models.Author    `db:"authors" json:"authors"`
 	Publisher models.Publisher `db:"publishers" json:"publishers"`
 	Category  models.Category  `db:"categories" json:"categories"`
