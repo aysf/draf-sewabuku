@@ -1,6 +1,7 @@
 package cart
 
 import (
+	"fmt"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
@@ -72,4 +73,23 @@ func (controller *Controller) ListBook(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success get book borrowing list", carts))
 
+}
+
+func (controller *Controller) ExtendDateDue(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+	var Date models.Cart
+	c.Bind(&Date)
+
+	inputDate := models.Cart{
+		DateDue: Date.DateDue,
+	}
+
+	updateCart, err := controller.cartModel.Extend(inputDate.DateDue, userId, int(Date.BookDataID))
+
+	if err != nil {
+		fmt.Println("cek1", err)
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to extend date due", err))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success to extend date due", updateCart))
 }
