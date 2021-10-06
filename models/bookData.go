@@ -2,7 +2,7 @@ package models
 
 type BookData struct {
 	ID          uint      `db:"id" json:"id"`
-	Title       string    `db:"tittle" json:"tittle"`
+	Title       string    `db:"title" json:"tittle"`
 	Photo       string    `json:"file_foto,omitempty"`
 	PublishYear uint      `db:"publish_year" json:"publish_year,omitempty"`
 	Quantity    uint      `json:"quantity"`

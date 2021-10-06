@@ -12,6 +12,7 @@ import (
 	"sewabuku/util"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/labstack/echo/v4"
@@ -29,15 +30,6 @@ func NewBookController(bookModel database.BookModel) *Controller {
 
 const ExtensionAllowed = ".jpg, .jpeg, .png"
 
-// func (controller *Controller) GetAllBookController(c echo.Context) error {
-// 	book, err := controller.bookModel.GetAll()
-// 	if err != nil {
-// 		return c.JSON(http.StatusBadRequest, "fail")
-// 	}
-
-// 	return c.JSON(http.StatusOK, book)
-// }
-
 func (h *Controller) GetAllBooks(c echo.Context) error {
 	books, err := h.bookModel.GetAllBooks()
 	if err != nil {
@@ -49,6 +41,24 @@ func (h *Controller) GetAllBooks(c echo.Context) error {
 
 	response := util.ResponseSuccess("success get all books", responseBook)
 	return c.JSON(http.StatusOK, response)
+}
+
+func (h *Controller) SearchAll(c echo.Context) error {
+	keyword := "%" + c.Param("keyword") + "%"
+	publisher, _ := strconv.Atoi(c.QueryParam("publisher"))
+	category, _ := strconv.Atoi(c.QueryParam("category"))
+	author, _ := strconv.Atoi(c.QueryParam("author"))
+
+	books, err := h.bookModel.SearchBooks(keyword, author, publisher, category)
+	if err != nil {
+		Response := util.ResponseError("error disini", err)
+		return c.JSON(http.StatusBadRequest, Response)
+	}
+
+	formatResponse := FormatResponseBooks(books)
+	response := util.ResponseSuccess("success", formatResponse)
+	return c.JSON(http.StatusOK, response)
+
 }
 
 func (h *Controller) GetDetailsBook(c echo.Context) error {
@@ -69,65 +79,6 @@ func (h *Controller) GetDetailsBook(c echo.Context) error {
 
 	response := util.ResponseSuccess("success", responseFormat)
 	return c.JSON(http.StatusOK, response)
-}
-
-func (controller *Controller) SearchBookController(c echo.Context) error {
-	keyword := "%" + c.Param("keyword") + "%"
-	category := "%" + c.QueryParam("category") + "%"
-	author := "%" + c.QueryParam("author") + "%"
-
-	books, err := controller.bookModel.Search(keyword, author, category)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
-
-	return c.JSON(http.StatusOK, books)
-}
-
-func (h *Controller) GetBookByname(c echo.Context) error {
-	name := c.Param("name")
-
-	books, err := h.bookModel.GetByNameBook(name)
-	if err != nil {
-		response := util.ResponseError(err.Error(), nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
-
-	if len(books) == 0 {
-		response := util.ResponseFail(fmt.Sprintf("there's no book with name %v", name), nil)
-		return c.JSON(http.StatusOK, response)
-	}
-
-	responseBook := FormatResponseBooks(books)
-
-	response := util.ResponseSuccess("ok", responseBook)
-	return c.JSON(http.StatusOK, response)
-
-}
-
-func (h *Controller) GetByCategoryID(c echo.Context) error {
-	category_id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		response := util.ResponseError("internal error", nil)
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	books, err := h.bookModel.GetByCategoryID(category_id)
-	if err != nil {
-		response := util.ResponseError(err.Error(), nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-
-	}
-	if len(books) == 0 {
-		response := util.ResponseFail("there is no book in this category", books)
-		return c.JSON(http.StatusOK, response)
-	}
-
-	responseBook := FormatResponseBooks(books)
-
-	response := util.ResponseSuccess("success", responseBook)
-	return c.JSON(http.StatusOK, response)
-
 }
 
 func (h *Controller) GetListAuthor(c echo.Context) error {
@@ -162,41 +113,12 @@ func (h *Controller) GetListCategory(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h *Controller) GetByAuthorID(c echo.Context) error {
-	author_id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		response := util.ResponseError("internal error", nil)
-		return c.JSON(http.StatusInternalServerError, response)
-	}
+func (h *Controller) FilterAuthorCategoryPublisher(c echo.Context) error {
+	publisher, _ := strconv.Atoi(c.QueryParam("publisher"))
+	category, _ := strconv.Atoi(c.QueryParam("category"))
+	author, _ := strconv.Atoi(c.QueryParam("author"))
 
-	books, err := h.bookModel.GetByAuthorID(author_id)
-	if err != nil {
-		response := util.ResponseError(err.Error(), nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-
-	}
-
-	if len(books) == 0 {
-		response := util.ResponseFail("no book found", nil)
-		return c.JSON(http.StatusOK, response)
-
-	}
-
-	responseBook := FormatResponseBooks(books)
-
-	response := util.ResponseSuccess("success", responseBook)
-	return c.JSON(http.StatusOK, response)
-
-}
-
-func (h *Controller) GetByPublisherID(c echo.Context) error {
-	publisher_id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		response := util.ResponseError("internal error", nil)
-		return c.JSON(http.StatusInternalServerError, response)
-	}
-
-	books, err := h.bookModel.GetByPublisherID(publisher_id)
+	books, err := h.bookModel.GetByKeywordID(author, category, publisher)
 	if err != nil {
 		response := util.ResponseError(err.Error(), nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
@@ -299,10 +221,15 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 func (h *Controller) BorrowBook(c echo.Context) error {
 	user_id := middlewares.ExtractTokenUserId(c)
+	var input models.InputBorrow
+	c.Bind(&input)
 
-	bookID, _ := strconv.Atoi(c.Param("id"))
+	if input.DateDue == time.Now() || input.DateReturn == time.Now() {
+		response := util.ResponseFail("please input date to return this book ", nil)
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
 
-	check, err := h.bookModel.GetBookByID(uint(bookID))
+	check, err := h.bookModel.GetBookByID(input.BookDataID)
 	if err != nil {
 		response := util.ResponseError("failed", nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
@@ -312,7 +239,15 @@ func (h *Controller) BorrowBook(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	carts, err := h.bookModel.BorrowBook(bookID, user_id)
+	cart := models.Cart{
+		UserID:     uint(user_id),
+		BookDataID: input.BookDataID,
+		DateLoan:   time.Now(),
+		DateDue:    input.DateDue,
+		DateReturn: input.DateReturn,
+	}
+
+	carts, err := h.bookModel.BorrowBook(cart)
 	if err != nil {
 		response := util.ResponseError("failed to borrow book", nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)

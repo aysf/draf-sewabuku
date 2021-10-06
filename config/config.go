@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"sewabuku/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -32,33 +31,33 @@ func DBConnect() *gorm.DB {
 		panic("could not connect database")
 	}
 
-	DBMigrate(db)
+	// DBMigrate(db)
 
 	return db
 }
 
-func DBMigrate(db *gorm.DB) {
-	db.Migrator().DropTable(&models.User{})
-	db.Migrator().DropTable(&models.Cart{})
-	db.Migrator().DropTable(&models.BookData{})
-	db.Migrator().DropTable(&models.Author{})
-	db.Migrator().DropTable(&models.Category{})
-	db.Migrator().DropTable(&models.Publisher{})
-	db.Migrator().DropTable(&models.Account{})
-	db.Migrator().DropTable(&models.Transfers{})
-	db.Migrator().DropTable(&models.Entry{})
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Cart{})
-	db.AutoMigrate(&models.BookData{})
-	db.AutoMigrate(&models.Author{})
-	db.AutoMigrate(&models.Category{})
-	db.AutoMigrate(&models.Publisher{})
-	db.AutoMigrate(&models.Account{})
-	db.AutoMigrate(&models.Transfers{})
-	db.AutoMigrate(&models.Entry{})
-	db.AutoMigrate(&models.LoanBook{})
+// func DBMigrate(db *gorm.DB) {
+// 	db.Migrator().DropTable(&models.User{})
+// 	db.Migrator().DropTable(&models.Cart{})
+// 	db.Migrator().DropTable(&models.BookData{})
+// 	db.Migrator().DropTable(&models.Author{})
+// 	db.Migrator().DropTable(&models.Category{})
+// 	db.Migrator().DropTable(&models.Publisher{})
+// 	db.Migrator().DropTable(&models.Account{})
+// 	db.Migrator().DropTable(&models.Transfers{})
+// 	db.Migrator().DropTable(&models.Entry{})
+// 	db.AutoMigrate(&models.User{})
+// 	db.AutoMigrate(&models.Cart{})
+// 	db.AutoMigrate(&models.BookData{})
+// 	db.AutoMigrate(&models.Author{})
+// 	db.AutoMigrate(&models.Category{})
+// 	db.AutoMigrate(&models.Publisher{})
+// 	db.AutoMigrate(&models.Account{})
+// 	db.AutoMigrate(&models.Transfers{})
+// 	db.AutoMigrate(&models.Entry{})
+// 	db.AutoMigrate(&models.LoanBook{})
 
-}
+// }
 
 //-------------------------------------------------------
 //	DB Config for Unit Testing

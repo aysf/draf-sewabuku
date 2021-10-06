@@ -13,3 +13,9 @@ type Cart struct {
 	User       User
 	BookData   BookData
 }
+
+type InputBorrow struct {
+	BookDataID uint      `json:"book_id" form:"book_id" gorm:"not null"`
+	DateDue    time.Time `json:"date_due" form:"date_due" gorm:"not null"`
+	DateReturn time.Time `json:"date_return" form:"date_return"`
+}
