@@ -56,6 +56,8 @@ type (
 		Logout(userId int) (models.User, error)
 		GetBorrowed(userId int, complete string) (Borrowed, error)
 		GetLent(userId int, complete string) (Lent, error)
+		InsertRating(rating models.Rating) (models.Rating, error)
+		//InsertLentRating(userId int) (models.Rating, error)
 	}
 )
 
@@ -265,3 +267,17 @@ func (g *GormUserModel) GetLent(userId int, complete string) (Lent, error) {
 
 	return user, nil
 }
+
+// InsertRating is method for insert rating from borrower to lender
+func (g *GormUserModel) InsertRating(rating models.Rating) (models.Rating, error) {
+	if err := g.db.Save(&rating).Error; err != nil {
+		return rating, err
+	}
+
+	return rating, nil
+}
+
+// InsertLentRating is method for insert rating from lender to borrower
+//func (g *GormUserModel) InsertLentRating(userId int) (models.Rating, error) {
+//
+//}
