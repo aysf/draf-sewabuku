@@ -28,4 +28,6 @@ func UserPath(e *echo.Echo, userController *user.Controller) {
 	jwtAuth.GET("/borrowed", userController.GetBorrowedController)
 
 	jwtAuth.GET("/lent", userController.GetLentController)
+
+	jwtAuth.POST("/lent/:id", userController.Insert)
 }

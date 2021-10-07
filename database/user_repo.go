@@ -56,6 +56,8 @@ type (
 		Logout(userId int) (models.User, error)
 		GetBorrowed(userId int, complete string) (Borrowed, error)
 		GetLent(userId int, complete string) (Lent, error)
+		InsertBorrowedRating(userId int) (models.Rating, error)
+		InsertLentRating(userId int) (models.Rating, error)
 	}
 )
 
@@ -264,4 +266,26 @@ func (g *GormUserModel) GetLent(userId int, complete string) (Lent, error) {
 	}
 
 	return user, nil
+}
+
+// InsertBorrowedRating is method for insert rating from borrower to lender
+func (g *GormUserModel) InsertBorrowedRating(userId int) (models.Rating, error) {
+
+	//	RateBook
+	//	float32
+	//	`json:"rate_book" form:"rate_book" gorm:"not null;default:0.0"`
+	//	RateBorrower
+	//	float32
+	//	`json:"rate_borrower" form:"rate_borrower" gorm:"not null;default:0.0"`
+	//	DescRateBook
+	//	string
+	//	`json:"desc_rate_book" form:"desc_rate_book"`
+	//	DescRateBorrower
+	//	string
+	//	`json:"desc_rate_borrower" form:"desc_rate_borrower"`
+}
+
+// InsertLentRating is method for insert rating from lender to borrower
+func (g *GormUserModel) InsertLentRating(userId int) (models.Rating, error) {
+
 }
