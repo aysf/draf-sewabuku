@@ -50,21 +50,21 @@ func (g *GormBookModel) SearchBooks(keyword string, author, publisher, category 
 	var tx *gorm.DB
 
 	if author != 0 && category != 0 && publisher != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND author_id = ? AND category_id = ? AND publisher_id = ?", keyword, author, category, publisher).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND author_id = ? AND category_id = ? AND publisher_id = ?", keyword, author, category, publisher).Find(&books)
 	} else if category != 0 && publisher != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND category_id = ? AND publisher_id = ?", keyword, category, publisher).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND category_id = ? AND publisher_id = ?", keyword, category, publisher).Find(&books)
 	} else if author != 0 && category != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND author_id = ? AND category_id = ?", keyword, author, category).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND author_id = ? AND category_id = ?", keyword, author, category).Find(&books)
 	} else if author != 0 && publisher != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND author_id = ? AND publisher_id = ?", keyword, author, publisher).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND author_id = ? AND publisher_id = ?", keyword, author, publisher).Find(&books)
 	} else if author != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND author_id = ?", keyword, author).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND author_id = ?", keyword, author).Find(&books)
 	} else if publisher != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND publisher_id = ?", keyword, publisher).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND publisher_id = ?", keyword, publisher).Find(&books)
 	} else if category != 0 {
-		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE title LIKE ? AND category_id = ?", keyword, category).Find(&books)
+		tx = g.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ? AND category_id = ?", keyword, category).Find(&books)
 	} else {
-		tx = g.db.Preload("User").Preload("Author").Preload("Publisher").Preload("Category").Raw("SELECT * FROM book_catalogs WHERE title LIKE ?", keyword).Find(&books)
+		tx = g.db.Preload("User").Preload("Author").Preload("Publisher").Preload("Category").Raw("SELECT * FROM book_catalogs WHERE CONCAT_WS ('', title, author, category,publisher) LIKE ?", keyword).Find(&books)
 	}
 
 	if tx.Error != nil {

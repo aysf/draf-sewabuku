@@ -17,13 +17,14 @@ func InsertDumyData(db *gorm.DB) {
 	pass, _ := bcrypt.GenerateFromPassword([]byte("123"), 14)
 	passStr := string(pass)
 	var User = []models.User{
-		{Name: "Ani", Email: "ani@g.c", Password: passStr, Address: "jakarta"},
-		{Name: "Budi", Email: "budi@g.c", Password: passStr, Address: "depok"},
-		{Name: "Danang", Email: "danang@.com", Password: passStr, Address: "bandung"},
-		{Name: "Sanas", Email: "sanas@gmail.", Password: passStr, Address: "sumedang"},
-		{Name: "kokoh", Email: "kooko@.com", Password: passStr, Address: "cikarang"},
-		{Name: "Saness", Email: "saneess@gmail.", Password: passStr, Address: "surabaya"},
-		{Name: "kokoh", Email: "koiooako@.com", Password: passStr, Address: "palembang"},
+		{Name: "Ani", Email: "ani@mail.com", Password: passStr, Address: "jakarta"},
+		{Name: "Baiq", Email: "baiq@mail.com", Password: passStr, Address: "depok"},
+		{Name: "Citra", Email: "citra@mail.com", Password: passStr, Address: "depok"},
+		{Name: "Desi", Email: "desi@mail.com", Password: passStr, Address: "bandung"},
+		{Name: "Eko", Email: "eko@mail.com", Password: passStr, Address: "bandung"},
+		{Name: "Fakhry", Email: "fakhry@mail.com", Password: passStr, Address: "sumedang"},
+		{Name: "Gun Gun", Email: "gun@mail.com", Password: passStr, Address: "cikarang"},
+		{Name: "Heri", Email: "heri@mail.com", Password: passStr, Address: "surabaya"},
 	}
 
 	// ----------------
@@ -31,9 +32,10 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var entry = []models.Entry{
-		{AccountID: 2, Amount: 25000, CreatedAt: time.Now()},
-		{AccountID: 4, Amount: 50000, CreatedAt: time.Now()},
-		{AccountID: 6, Amount: 75000, CreatedAt: time.Now()},
+		{AccountID: 5, Amount: 25000, CreatedAt: time.Now()},
+		{AccountID: 6, Amount: 50000, CreatedAt: time.Now()},
+		{AccountID: 7, Amount: 75000, CreatedAt: time.Now()},
+		{AccountID: 8, Amount: 100000, CreatedAt: time.Now()},
 	}
 
 	// ----------------
@@ -43,8 +45,8 @@ func InsertDumyData(db *gorm.DB) {
 	var bookData = []models.BookData{
 		{
 			Title:       "Rich Dad Poor Dad",
-			UserID:      2,
-			Quantity:    2,
+			UserID:      1,
+			Quantity:    5,
 			Photo:       "default.jpg",
 			AuthorID:    3,
 			PublisherID: 2,
@@ -54,9 +56,9 @@ func InsertDumyData(db *gorm.DB) {
 		},
 		{
 			Title:       "Kambing Jantan",
-			UserID:      4,
+			UserID:      2,
 			Photo:       "default.jpg",
-			Quantity:    2,
+			Quantity:    1,
 			AuthorID:    4,
 			PublisherID: 4,
 			CategoryID:  5,
@@ -65,7 +67,7 @@ func InsertDumyData(db *gorm.DB) {
 		},
 		{
 			Title:       "Rumah Seribu Malaikat",
-			UserID:      5,
+			UserID:      1,
 			Photo:       "default.jpg",
 			Quantity:    1,
 			AuthorID:    5,
@@ -76,7 +78,7 @@ func InsertDumyData(db *gorm.DB) {
 		},
 		{
 			Title:       "The Cruel Prince",
-			UserID:      2,
+			UserID:      1,
 			Photo:       ".jpg",
 			Quantity:    0,
 			AuthorID:    6,
@@ -87,7 +89,7 @@ func InsertDumyData(db *gorm.DB) {
 		},
 		{
 			Title:       "The Black Box",
-			UserID:      1,
+			UserID:      3,
 			Quantity:    1,
 			Photo:       ".jpg",
 			AuthorID:    7,
@@ -98,7 +100,7 @@ func InsertDumyData(db *gorm.DB) {
 		},
 		{
 			Title:       "Black Clover",
-			UserID:      1,
+			UserID:      4,
 			AuthorID:    8,
 			Quantity:    1,
 			Photo:       ".jpg",
@@ -108,8 +110,8 @@ func InsertDumyData(db *gorm.DB) {
 			Price:       100,
 		},
 		{
-			Title:       "Langit Bumi",
-			UserID:      2,
+			Title:       "La Tahzan",
+			UserID:      6,
 			Quantity:    1,
 			Photo:       "jpg",
 			AuthorID:    6,
@@ -129,10 +131,10 @@ func InsertDumyData(db *gorm.DB) {
 			PublishYear: 2010,
 			Price:       100,
 		}, {
-			Title:       "masak",
+			Title:       "Juru Masak Para Maiko 05",
 			UserID:      1,
 			Quantity:    2,
-			Photo:       ".jpg",
+			Photo:       "default.jpg",
 			AuthorID:    1,
 			PublisherID: 2,
 			CategoryID:  3,
@@ -142,7 +144,7 @@ func InsertDumyData(db *gorm.DB) {
 			Title:       "surga yang indah",
 			UserID:      1,
 			Quantity:    1,
-			Photo:       ".jpg",
+			Photo:       "default.jpg",
 			AuthorID:    1,
 			PublisherID: 2,
 			CategoryID:  7,
