@@ -21,10 +21,12 @@ type Rating struct {
 	DescRateBook     string  `json:"desc_rate_book" form:"desc_rate_book"`
 	DescRateBorrower string  `json:"desc_rate_borrower" form:"desc_rate_borrower"`
 	Cart             Cart
+
 }
 
 type InputBorrow struct {
 	BookDataID uint      `json:"book_id" form:"book_id" gorm:"not null"`
 	DateDue    time.Time `json:"date_due" form:"date_due" gorm:"not null"`
 	DateReturn time.Time `json:"date_return" form:"date_return"`
+
 }

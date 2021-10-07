@@ -8,6 +8,7 @@ type BookData struct {
 	Quantity    uint      `json:"quantity"`
 	Price       uint      `json:"rent_price"`
 	Description string    `json:"description,omitempty"`
+	Rating      float32   `json:"rating"`
 	UserID      uint      `db:"user_id" json:"-"`
 	User        User      `db:"users" json:"user"`
 	PublisherID uint      `db:"publisher_id" json:"-"`

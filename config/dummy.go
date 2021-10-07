@@ -195,6 +195,24 @@ func InsertDumyData(db *gorm.DB) {
 		{Name: "Orion"},
 	}
 
+	var Cart = []models.Cart{
+		{ID: 1, UserID: 1, BookDataID: 4, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+		{ID: 2, UserID: 3, BookDataID: 4, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+		{ID: 3, UserID: 2, BookDataID: 3, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+		{ID: 4, UserID: 2, BookDataID: 1, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+		{ID: 5, UserID: 1, BookDataID: 2, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+		{ID: 6, UserID: 3, BookDataID: 3, DateLoan: time.Now(), DateDue: time.Now(), DateReturn: time.Now(), IsReturn: true},
+	}
+
+	var Rating = []models.Rating{
+		{ID: 1, CartID: 1, RateBook: 8, RateBorrower: 7, DescRateBook: "asala", DescRateBorrower: "gtddnj"},
+		{ID: 2, CartID: 2, RateBook: 7, RateBorrower: 7, DescRateBook: "asali", DescRateBorrower: "gtddnj"},
+		{ID: 3, CartID: 3, RateBook: 7, RateBorrower: 7, DescRateBook: "asalcoba", DescRateBorrower: "gtddnj"},
+		{ID: 4, CartID: 4, RateBook: 8, RateBorrower: 7, DescRateBook: "asalaja", DescRateBorrower: "gtddnj"},
+		{ID: 5, CartID: 5, RateBook: 7, RateBorrower: 7, DescRateBook: "asal", DescRateBorrower: "gtddnj"},
+		{ID: 6, CartID: 6, RateBook: 6, RateBorrower: 7, DescRateBook: "asal", DescRateBorrower: "gtddnj"},
+	}
+
 	// ----------------
 	// Book User mock
 	// ----------------
@@ -205,5 +223,7 @@ func InsertDumyData(db *gorm.DB) {
 	db.Create(&Author)
 	db.Create(&Publisher)
 	db.Create(&bookData)
+	db.Create(&Cart)
+	db.Create(&Rating)
 
 }

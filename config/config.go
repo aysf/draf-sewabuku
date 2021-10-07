@@ -57,6 +57,7 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Account{})
 	db.AutoMigrate(&models.Transfers{})
 	db.AutoMigrate(&models.Entry{})
+	db.AutoMigrate(&models.LoanBook{})
 	db.AutoMigrate(&models.Rating{})
 }
 
