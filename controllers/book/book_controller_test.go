@@ -1,12 +1,13 @@
 package book
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sewabuku/config"
 	"sewabuku/database"
-	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -14,14 +15,14 @@ import (
 )
 
 // import "testing"
-var (
-	e           = echo.New()
-	db          = config.DBConnect()
-	bookmodel   = database.NewBookModel(db)
-	bookHandler = NewBookController(bookmodel)
-)
 
-func TestGetByKeyWord(t *testing.T) {
+type bookResponse struct {
+	Status  string      `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
+func TestFilterring(t *testing.T) {
 	testCases := []struct {
 		testName   int
 		category   int
@@ -47,16 +48,72 @@ func TestGetByKeyWord(t *testing.T) {
 		},
 	}
 
+	e := echo.New()
+	db := config.DBConnectTest()
+	bookmodel := database.NewBookModel(db)
+	bookHandler := NewBookController(bookmodel)
 	for _, testCase := range testCases {
-		reqBody := fmt.Sprintf("%d", testCase.category)
-		req := httptest.NewRequest(http.MethodGet, "/books/search", strings.NewReader(reqBody))
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		reqBody := fmt.Sprintf("?publisher=%d&?category=%d", testCase.publisher, testCase.category)
+		reqBodyJson, _ := json.Marshal(reqBody)
+		req := httptest.NewRequest(http.MethodGet, "/books/s", bytes.NewBuffer(reqBodyJson))
+		// req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		res := httptest.NewRecorder()
+		responseMsg := res.Body.String()
 		c := e.NewContext(req, res)
-		bookHandler.FilterAuthorCategoryPublisher(c)
+		err := bookHandler.FilterAuthorCategoryPublisher(c)
+		if err != nil {
+			fmt.Println(err)
+		}
+		var response bookResponse
+		json.Unmarshal([]byte(responseMsg), &response)
+		fmt.Println(res)
 		if assert.NoError(t, bookHandler.FilterAuthorCategoryPublisher(c)) {
 
 			assert.Equal(t, testCase.expectCode, res.Code)
+			assert.Equal(t, testCase.expectMsg, response.Message)
+		}
+
+	}
+
+}
+
+func TestGetALL(t *testing.T) {
+	testCases := []struct {
+		testName int
+
+		expectCode int
+		expectMsg  string
+	}{
+		{
+			testName:   1,
+			expectCode: http.StatusOK,
+			expectMsg:  "success",
+		}, {
+			testName:   2,
+			expectCode: http.StatusOK,
+			expectMsg:  "success",
+		},
+	}
+
+	e := echo.New()
+	db := config.DBConnectTest()
+	bookmodel := database.NewBookModel(db)
+	bookHandler := NewBookController(bookmodel)
+	for _, testCase := range testCases {
+		req := httptest.NewRequest(http.MethodGet, "/all", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		c := e.NewContext(req, res)
+		err := bookHandler.GetAllBooks(c)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(res)
+
+		if assert.NoError(t, bookHandler.GetAllBooks(c)) {
+
+			assert.Equal(t, testCase.expectCode, res.Code)
+			assert.Equal(t, testCase.expectMsg, res.Result().Body)
 		}
 
 	}

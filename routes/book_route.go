@@ -18,7 +18,7 @@ func BookPath(e *echo.Echo, bookController *book.Controller) {
 
 	bookGroup.GET("/all", bookController.GetAllBooks)
 
-	bookGroup.GET("/search", bookController.FilterAuthorCategoryPublisher)
+	bookGroup.GET("/s", bookController.FilterAuthorCategoryPublisher)
 
 	bookGroup.GET("/listauthor", bookController.GetListAuthor)
 
