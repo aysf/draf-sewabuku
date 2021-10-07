@@ -6,6 +6,7 @@ import (
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -152,4 +153,48 @@ func (controller *Controller) GetLentController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Lent Book", user))
+}
+
+//InsertRatingBookController is controller for insert rating book
+func (controller *Controller) InsertRatingBookController(c echo.Context) error {
+	var rating models.Rating
+	c.Bind(&rating)
+
+	cartId, _ := strconv.Atoi(c.Param("id"))
+
+	insertRating := models.Rating{
+		CartID:       uint(cartId),
+		RateBook:     rating.RateBook,
+		DescRateBook: rating.DescRateBook,
+	}
+
+	_, err := controller.userModel.InsertRating(insertRating)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Give Book Rating", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Give Book Rating", nil))
+}
+
+//InsertRatingBorrowerController is controller for insert rating book
+func (controller *Controller) InsertRatingBorrowerController(c echo.Context) error {
+	var rating models.Rating
+	c.Bind(&rating)
+
+	cartId, _ := strconv.Atoi(c.Param("id"))
+
+	insertRating := models.Rating{
+		CartID:           uint(cartId),
+		RateBorrower:     rating.RateBorrower,
+		DescRateBorrower: rating.DescRateBorrower,
+	}
+
+	_, err := controller.userModel.InsertRating(insertRating)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Give Borrower Rating", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Give Borrower Rating", nil))
 }
