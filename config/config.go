@@ -59,7 +59,6 @@ func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&models.Entry{})
 	db.AutoMigrate(&models.LoanBook{})
 	db.AutoMigrate(&models.Rating{})
-
 }
 
 //-------------------------------------------------------

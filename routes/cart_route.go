@@ -18,6 +18,9 @@ func CartPath(e *echo.Echo, cartController *cart.Controller) {
 	// return book
 	jwtAuth.PUT("/cart/return", cartController.ReturnBook)
 
+	// extend book
+	jwtAuth.PUT("/cart/extend", cartController.ExtendDateDue)
+
 	// list book
 	jwtAuth.GET("/cart", cartController.ListBook)
 

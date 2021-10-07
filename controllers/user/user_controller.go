@@ -26,21 +26,22 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if err := c.Validate(&userRequest); err != nil {
-		return c.JSON(http.StatusInternalServerError, util.ResponseError("Check Your Input", nil))
+	if err := c.Validate(userRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Check Your Input", nil))
 	}
 
 	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
-		Address:  userRequest.Address,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Password:         userRequest.Password,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Register Failed", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
@@ -85,19 +86,13 @@ func (controller *Controller) UpdateUserProfileController(c echo.Context) error 
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	user := models.User{
-		Name:    userRequest.Name,
-		Email:   userRequest.Email,
-		Address: userRequest.Address,
-	}
-
-	_, err := controller.userModel.UpdateProfile(user, userId)
+	_, err := controller.userModel.UpdateProfile(userRequest, userId)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Update User Profile", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Update Profile", nil))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Update Profile", nil))
 }
 
 // UpdatePasswordController is controller for user edit their password
@@ -107,9 +102,54 @@ func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if _, err := controller.userModel.UpdatePassword(userRequest, userId); err != nil {
+	user := models.User{Password: userRequest.Password}
+
+	if _, err := controller.userModel.UpdatePassword(user, userId); err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Change Password", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Change Password", nil))
+}
+
+// LogoutUserController is controller for user log out
+func (controller *Controller) LogoutUserController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	_, err := controller.userModel.Logout(userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Logout Failed", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Logout Success", nil))
+}
+
+// GetBorrowedController is controller for get borrowed book
+func (controller *Controller) GetBorrowedController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetBorrowed(userId, complete)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Borrowed Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Borrowed Book", user))
+}
+
+// GetLentController is controller for get borrowed book
+func (controller *Controller) GetLentController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetLent(userId, complete)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Lent Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Lent Book", user))
 }
