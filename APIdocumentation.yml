@@ -44,13 +44,16 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Tegar Aditia
+                  example: Heri
                 email:
                   type: string
-                  example: bangtegar@gmail.com
+                  example: heri@mail.com
                 password:
                   type: string
-                  example: iniPaswordAing123
+                  example: iniPaswordHeri123
+                address:
+                  type: string
+                  example: Surabaya
       responses:
         '200':
           $ref: '#/components/responses/registerSuccess'
@@ -69,10 +72,10 @@ paths:
               properties:
                 email:
                   type: string
-                  example: bangtegar@gmail.com
+                  example: heri@mail.com
                 password:
                   type: string
-                  example: iniPaswordAing123
+                  example: iniPaswordHeri123
       responses:
         '200':
           $ref: '#/components/responses/loginSuccess'
@@ -88,7 +91,7 @@ paths:
           $ref: '#/components/responses/getUserProfileSuccess'
         '400':
           $ref: '#/components/responses/getUserProfileFailed'
-    post:
+    put:
       tags:
         - Users
       description: Edit user profile
@@ -110,7 +113,7 @@ paths:
         '400':
           $ref: '#/components/responses/editUserProfileFailed'
   /users/change-password:
-    post:
+    put:
       tags:
         - Users
       description: Edit user password
@@ -131,6 +134,77 @@ paths:
           $ref: '#/components/responses/editUserPasswordSuccess'
         '400':
           $ref: '#/components/responses/editUserPasswordFailed'
+  /users/logout:
+    put:
+      tags:
+        - Users
+      description: User Logout
+      responses:
+        '200':
+          $ref: '#/components/responses/logoutSuccess'
+        '400':
+          $ref: '#/components/responses/logoutFailed'
+  /users/borrowed:
+    get:
+      tags:
+        - Users
+      description: Get Borrowed Book
+      responses:
+        '200':
+          $ref: '#/components/responses/'
+        '400':
+          $ref: '#/components/responses/'
+  /users/lent:
+    get:
+      tags:
+        - Users
+      description: Get Lent Book
+      responses:
+        '200':
+          $ref: '#/components/responses/'
+        '400':
+          $ref: '#/components/responses/'
+  /users/book-rating/{id}:
+    post:
+      tags:
+        - Users
+      description: Edit user password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+              #
+              # belum
+              #
+              #
+
+      responses:
+        '200':
+          $ref: '#/components/responses/inputBookRatingSuccess'
+        '400':
+          $ref: '#/components/responses/inputBookRatingFailed'
+  /users/borrower-rating/{id}:
+    post:
+      tags:
+        - Users
+      description: Edit user password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+              #
+              #bleum
+              #
+              #
+      responses:
+        '200':
+          $ref: '#/components/responses/inputBorrowerRatingSuccess'
+        '400':
+          $ref: '#/components/responses/inputBorrowerRatingFailed'
   ####################################
   #  BOOKS
   ####################################
@@ -334,6 +408,21 @@ components:
               message:
                 type: string
                 example: Success Get User Profile
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Heri
+                  email:
+                    type: string
+                    example: heri@mail.com
+                  address:
+                    type: string
+                    example: Surabaya
+                  balance:
+                    type: integer
+                    example: 100000
     getUserProfileFailed:
       description: fail to get user profile
       content:
@@ -362,7 +451,7 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Change User Profile
+                example: Success Update Profile
     editUserProfileFailed:
       description: fail to change user profile
       content:
@@ -375,7 +464,7 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Change User Profile
+                example: Fail to Update Profile
     #==================================#
     #    RESPONSE EDIT USER PASSWORD
     #==================================#
@@ -405,6 +494,97 @@ components:
               message:
                 type: string
                 example: Fail to Change Password
+    #==================================#
+    #    RESPONSE LOGOUT
+    #==================================#
+    logoutSuccess:
+      description: success logout
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Logout Success
+    logoutFailed:
+      description: fail to logout
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Logout Failed
+
+    ##user borrowed dan userlent belum
+
+
+    #==================================#
+    #    RESPONSE INPUT BOOK RATING
+    #==================================#
+    inputBookRatingSuccess:
+      description: success give book rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Give Book Rating
+    inputBookRatingFailed:
+      description: fail to give book rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Give Book Rating
+    #==================================#
+    #    RESPONSE INPUT BOOK RATING
+    #==================================#
+    inputBorrowerRatingSuccess:
+      description: success give borrower rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Give Borrower Rating
+    inputBorrowerRatingFailed:
+      description: fail to give Borrower rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Give Borrower Rating
     #==================================#
     #    RESPONSE INSERT BOOK
     #==================================#
