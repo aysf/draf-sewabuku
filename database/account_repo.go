@@ -13,7 +13,7 @@ type (
 	}
 	AccountModel interface {
 		Show(userId int) (models.Account, error)
-		Add(entry models.Entry) (models.Entry, error)
+		Transaction(entry models.Entry) (models.Entry, error)
 	}
 )
 
@@ -41,7 +41,7 @@ func (g GormAccountModel) Show(userId int) (models.Account, error) {
 	return account, nil
 }
 
-func (g GormAccountModel) Add(entry models.Entry) (models.Entry, error) {
+func (g GormAccountModel) Transaction(entry models.Entry) (models.Entry, error) {
 	if err := g.db.Create(&entry).Error; err != nil {
 		return entry, err
 	}
