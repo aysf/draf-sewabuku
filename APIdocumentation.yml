@@ -278,8 +278,16 @@ paths:
           $ref: '#/components/responses/searchBookByKeywordSuccess'
         '400':
           $ref: '#/components/responses/searchBookByKeywordFailed'
-
-
+  /books/list-author:
+    get:
+      tags:
+        - Books
+      description: Get list author
+      responses:
+        '200':
+          $ref: '#/components/responses/getListAuthorSuccess'
+        '400':
+          $ref: '#/components/responses/getListAuthorFailed'
   #
   ####################################
   #  ACCOUNTS
@@ -746,6 +754,126 @@ components:
               message:
                 type: string
                 example: Fail to Search Book
+    #==================================#
+    #    RESPONSE GET LIST CATEGORY
+    #==================================#
+    getListCategorySuccess:
+      description: success get list category
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Get List Category
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 2
+                    name:
+                      type: string
+                      example: Sejarah
+    getListCategoryFailed:
+      description: fail to get list category
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Get List Category
+    #==================================#
+    #    RESPONSE GET LIST PUBLISHER
+    #==================================#
+    getListPublisherSuccess:
+      description: success get list publisher
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Get List Publisher
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 2
+                    name:
+                      type: string
+                      example: Gramedia
+    getListPublisherFailed:
+      description: fail to get list publisher
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Get List Publisher
+    #==================================#
+    #    RESPONSE GET LIST AUTHOR
+    #==================================#
+    getListAuthorSuccess:
+      description: success get list author
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Get List Author
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: JK. Rowling
+    getListAuthorFailed:
+      description: fail to get list author
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Get List Author
     #==================================#
     #    RESPONSE GET TRANSACTION
     #==================================#
