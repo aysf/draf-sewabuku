@@ -44,13 +44,16 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Tegar Aditia
+                  example: Heri
                 email:
                   type: string
-                  example: bangtegar@gmail.com
+                  example: heri@mail.com
                 password:
                   type: string
-                  example: iniPaswordAing123
+                  example: iniPaswordHeri123
+                address:
+                  type: string
+                  example: Surabaya
       responses:
         '200':
           $ref: '#/components/responses/registerSuccess'
@@ -69,10 +72,10 @@ paths:
               properties:
                 email:
                   type: string
-                  example: bangtegar@gmail.com
+                  example: heri@mail.com
                 password:
                   type: string
-                  example: iniPaswordAing123
+                  example: iniPaswordHeri123
       responses:
         '200':
           $ref: '#/components/responses/loginSuccess'
@@ -88,7 +91,7 @@ paths:
           $ref: '#/components/responses/getUserProfileSuccess'
         '400':
           $ref: '#/components/responses/getUserProfileFailed'
-    post:
+    put:
       tags:
         - Users
       description: Edit user profile
@@ -110,7 +113,7 @@ paths:
         '400':
           $ref: '#/components/responses/editUserProfileFailed'
   /users/change-password:
-    post:
+    put:
       tags:
         - Users
       description: Edit user password
@@ -131,10 +134,84 @@ paths:
           $ref: '#/components/responses/editUserPasswordSuccess'
         '400':
           $ref: '#/components/responses/editUserPasswordFailed'
+  /users/logout:
+    put:
+      tags:
+        - Users
+      description: User Logout
+      responses:
+        '200':
+          $ref: '#/components/responses/logoutSuccess'
+        '400':
+          $ref: '#/components/responses/logoutFailed'
+  /users/borrowed:
+    get:
+      tags:
+        - Users
+      description: Get Borrowed Book
+      responses:
+        '200':
+          $ref: '#/components/responses/'
+        '400':
+          $ref: '#/components/responses/'
+  /users/lent:
+    get:
+      tags:
+        - Users
+      description: Get Lent Book
+      responses:
+        '200':
+          $ref: '#/components/responses/'
+        '400':
+          $ref: '#/components/responses/'
+  /users/book-rating/{cart-id}:
+    post:
+      tags:
+        - Users
+      description: Input Book Rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate_book:
+                  type: integer
+                  example: 3
+                desc_rate_book:
+                  type: string
+                  example: This book is awesome!
+      responses:
+        '200':
+          $ref: '#/components/responses/inputBookRatingSuccess'
+        '400':
+          $ref: '#/components/responses/inputBookRatingFailed'
+  /users/borrower-rating/{cart-id}:
+    post:
+      tags:
+        - Users
+      description: Input Borrower Rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate_borrower:
+                  type: integer
+                  example: 5
+                desc_rate_borrower:
+                  type: string
+                  example: This borrower is good!
+      responses:
+        '200':
+          $ref: '#/components/responses/inputBorrowerRatingSuccess'
+        '400':
+          $ref: '#/components/responses/inputBorrowerRatingFailed'
   ####################################
   #  BOOKS
   ####################################
-  /books:
+  /books/new-book:
     post:
       tags:
         - Books
@@ -145,12 +222,36 @@ paths:
             schema:
               type: object
               properties:
-              #ini body request book
+                title:
+                  type: string
+                  example: The Cruel Prince
+                category_id:
+                  type: integer
+                  example: 6
+                author_id:
+                  type: integer
+                  example: 6
+                publisher_id:
+                  type: integer
+                  example: 5
+                publish_year:
+                  type: string
+                  example: 2009
+                price:
+                  type: integer
+                  example: 500
+                quantity:
+                  type: integer
+                  example: 1
+                description:
+                  type: string
+                  example: The Cruel Prince follows Jude, a human girl living among faeries. She wants to fit in, but her stubbornness and determination cause her to stand out among the royal family, where she aspires to become a knight. Jude has a twin sister Taryn and an older sister named Vivienne, who is a Faerie. Vivienne and Jude are both very rebellious and try their hardest to get what they want, no matter the circumstances, while Taryn is more of a people-pleaser.
       responses:
         '200':
           $ref: '#/components/responses/insertBookSuccess'
         '400':
           $ref: '#/components/responses/insertBookFailed'
+  /books/all:
     get:
       tags:
         - Books
@@ -160,74 +261,33 @@ paths:
           $ref: '#/components/responses/getAllBookSuccess'
         '400':
           $ref: '#/components/responses/getAllBookFailed'
-  /books/{id}:
+  /books/search/{keyword}:
     parameters:
       - in: path
-        name: id
+        name: keyword
         schema:
-          type: number
-          example: 2
+          type: string
+          example: Rich Dad
         required: true
-    put:
-      tags:
-        - Books
-      description: Update book
-      responses:
-        '200':
-          $ref: '#/components/responses/updateBookSuccess'
-        '400':
-          $ref: '#/components/responses/updateBookFailed'
-    delete:
-      tags:
-        - Books
-      description: Delete book
-      responses:
-        '200':
-          $ref: '#/components/responses/deleteBookSuccess'
-        '400':
-          $ref: '#/components/responses/deleteBookFailed'
-  /books/category:
     get:
       tags:
         - Books
-      description: Get all book by category
+      description: Search book by keyword
       responses:
         '200':
-          $ref: '#/components/responses/getBookByCategorySuccess'
+          $ref: '#/components/responses/searchBookByKeywordSuccess'
         '400':
-          $ref: '#/components/responses/getBookByCategoryFailed'
-  /books/name:
+          $ref: '#/components/responses/searchBookByKeywordFailed'
+  /books/list-author:
     get:
       tags:
         - Books
-      description: Get all book by title
+      description: Get list author
       responses:
         '200':
-          $ref: '#/components/responses/getBookByTitleSuccess'
+          $ref: '#/components/responses/getListAuthorSuccess'
         '400':
-          $ref: '#/components/responses/getBookByTitleFailed'
-  /books/author:
-    get:
-      tags:
-        - Books
-      description: Get all book by author
-      responses:
-        '200':
-          $ref: '#/components/responses/getBookByAuthorSuccess'
-        '400':
-          $ref: '#/components/responses/getBookByAuthorFailed'
-  /books/publisher:
-    get:
-      tags:
-        - Books
-      description: Get all book by publisher
-      responses:
-        '200':
-          $ref: '#/components/responses/getBookByPublisherSuccess'
-        '400':
-          $ref: '#/components/responses/getBookByPublisherFailed'
-
-
+          $ref: '#/components/responses/getListAuthorFailed'
   #
   ####################################
   #  ACCOUNTS
@@ -334,6 +394,21 @@ components:
               message:
                 type: string
                 example: Success Get User Profile
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Heri
+                  email:
+                    type: string
+                    example: heri@mail.com
+                  address:
+                    type: string
+                    example: Surabaya
+                  balance:
+                    type: integer
+                    example: 100000
     getUserProfileFailed:
       description: fail to get user profile
       content:
@@ -362,7 +437,7 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Change User Profile
+                example: Success Update Profile
     editUserProfileFailed:
       description: fail to change user profile
       content:
@@ -375,7 +450,7 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Change User Profile
+                example: Fail to Update Profile
     #==================================#
     #    RESPONSE EDIT USER PASSWORD
     #==================================#
@@ -405,6 +480,97 @@ components:
               message:
                 type: string
                 example: Fail to Change Password
+    #==================================#
+    #    RESPONSE LOGOUT
+    #==================================#
+    logoutSuccess:
+      description: success logout
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Logout Success
+    logoutFailed:
+      description: fail to logout
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Logout Failed
+
+    ##user borrowed dan userlent belum
+
+
+    #==================================#
+    #    RESPONSE INPUT BOOK RATING
+    #==================================#
+    inputBookRatingSuccess:
+      description: success give book rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Give Book Rating
+    inputBookRatingFailed:
+      description: fail to give book rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Give Book Rating
+    #==================================#
+    #    RESPONSE INPUT BOOK RATING
+    #==================================#
+    inputBorrowerRatingSuccess:
+      description: success give borrower rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Give Borrower Rating
+    inputBorrowerRatingFailed:
+      description: fail to give Borrower rating
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Fail to Give Borrower Rating
     #==================================#
     #    RESPONSE INSERT BOOK
     #==================================#
@@ -450,6 +616,54 @@ components:
               message:
                 type: string
                 example: Success Get All Book
+              data:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: Rich Dad Poor Dad
+                  file_foto:
+                    type: string
+                    example: sdJksHJ12ks.jpg
+                  rent_price:
+                    type: integer
+                    example: 500
+                  address:
+                    type: string
+                    example: Depok
+                  author:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 3
+                      name:
+                        type: string
+                        example: Robert Kiyosaki
+                  publisher:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      name:
+                        type: integer
+                        example: Gramedia
+                  category:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4
+                      name:
+                        type: string
+                        example: Motivasi
+                  is_available:
+                    type: boolean
+                    example: true
     getAllBookFailed:
       description: fail to get all book
       content:
@@ -464,10 +678,10 @@ components:
                 type: string
                 example: Fail to Get All Book
     #==================================#
-    #    RESPONSE UPDATE BOOK
+    #    RESPONSE SEARCH BOOK
     #==================================#
-    updateBookSuccess:
-      description: success update book
+    searchBookByKeywordSuccess:
+      description: success search book
       content:
         application/json:
           schema:
@@ -478,9 +692,57 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Update Book
-    updateBookFailed:
-      description: fail to insert book
+                example: Success Seach Book
+              data:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: Rich Dad Poor Dad
+                  file_foto:
+                    type: string
+                    example: sdJksHJ12ks.jpg
+                  rent_price:
+                    type: integer
+                    example: 500
+                  address:
+                    type: string
+                    example: Depok
+                  author:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 3
+                      name:
+                        type: string
+                        example: Robert Kiyosaki
+                  publisher:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      name:
+                        type: integer
+                        example: Gramedia
+                  category:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4
+                      name:
+                        type: string
+                        example: Motivasi
+                  is_available:
+                    type: boolean
+                    example: true
+    searchBookByKeywordFailed:
+      description: fail to search book
       content:
         application/json:
           schema:
@@ -491,12 +753,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Update Book
+                example: Fail to Search Book
     #==================================#
-    #    RESPONSE DELETE BOOK
+    #    RESPONSE GET LIST CATEGORY
     #==================================#
-    deleteBookSuccess:
-      description: success delete book
+    getListCategorySuccess:
+      description: success get list category
       content:
         application/json:
           schema:
@@ -507,9 +769,20 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Delete Book
-    deleteBookFailed:
-      description: fail to delete book
+                example: Success Get List Category
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 2
+                    name:
+                      type: string
+                      example: Sejarah
+    getListCategoryFailed:
+      description: fail to get list category
       content:
         application/json:
           schema:
@@ -520,12 +793,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Delete Book
+                example: Fail to Get List Category
     #==================================#
-    #    RESPONSE GET BOOK BY CATEGORY
+    #    RESPONSE GET LIST PUBLISHER
     #==================================#
-    getBookByCategorySuccess:
-      description: success get book by category
+    getListPublisherSuccess:
+      description: success get list publisher
       content:
         application/json:
           schema:
@@ -536,9 +809,20 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Get Book By Category
-    getBookByCategoryFailed:
-      description: fail to get book by category
+                example: Success Get List Publisher
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 2
+                    name:
+                      type: string
+                      example: Gramedia
+    getListPublisherFailed:
+      description: fail to get list publisher
       content:
         application/json:
           schema:
@@ -549,12 +833,12 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Get Book By Category
+                example: Fail to Get List Publisher
     #==================================#
-    #    RESPONSE GET BOOK BY TITLE
+    #    RESPONSE GET LIST AUTHOR
     #==================================#
-    getBookByTitleSuccess:
-      description: success get book by title
+    getListAuthorSuccess:
+      description: success get list author
       content:
         application/json:
           schema:
@@ -565,9 +849,20 @@ components:
                 example: success
               message:
                 type: string
-                example: Success Get Book By Title
-    getBookByTitleFailed:
-      description: fail to get book by title
+                example: Success Get List Author
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: JK. Rowling
+    getListAuthorFailed:
+      description: fail to get list author
       content:
         application/json:
           schema:
@@ -578,65 +873,7 @@ components:
                 example: fail
               message:
                 type: string
-                example: Fail to Get Book By Title
-    #==================================#
-    #    RESPONSE GET BOOK BY AUTHOR
-    #==================================#
-    getBookByAuthorSuccess:
-      description: success get book by author
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              status:
-                type: string
-                example: success
-              message:
-                type: string
-                example: Success Get Book By Author
-    getBookByAuthorFailed:
-      description: fail to get book by author
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              status:
-                type: string
-                example: fail
-              message:
-                type: string
-                example: Fail to Get Book By Author
-    #==================================#
-    #    RESPONSE GET BOOK BY PUBLISHER
-    #==================================#
-    getBookByPublisherSuccess:
-      description: success get book by publisher
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              status:
-                type: string
-                example: success
-              message:
-                type: string
-                example: Success Get Book By Publiser
-    getBookByPublisherFailed:
-      description: fail to get book by publisher
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              status:
-                type: string
-                example: fail
-              message:
-                type: string
-                example: Fail to Get Book By Publisher
+                example: Fail to Get List Author
     #==================================#
     #    RESPONSE GET TRANSACTION
     #==================================#
