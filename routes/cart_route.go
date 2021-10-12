@@ -9,19 +9,19 @@ import (
 )
 
 func CartPath(e *echo.Echo, cartController *cart.Controller) {
-	jwtAuth := e.Group("")
+	jwtAuth := e.Group("/carts")
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 
 	// rent book
-	jwtAuth.POST("/cart/rent", cartController.RentBook)
+	jwtAuth.POST("/rent", cartController.RentBook)
 
 	// return book
-	jwtAuth.PUT("/cart/return", cartController.ReturnBook)
+	jwtAuth.PUT("/return", cartController.ReturnBook)
 
 	// extend book
-	jwtAuth.PUT("/cart/extend", cartController.ExtendDateDue)
+	jwtAuth.PUT("/extend", cartController.ExtendDateDue)
 
 	// list book
-	jwtAuth.GET("/cart", cartController.ListBook)
+	jwtAuth.GET("/", cartController.ListBook)
 
 }

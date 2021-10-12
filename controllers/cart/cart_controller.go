@@ -7,6 +7,7 @@ import (
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,6 +29,32 @@ func (controller *Controller) RentBook(c echo.Context) error {
 	c.Bind(&cartRequest)
 
 	userId := middlewares.ExtractTokenUserId(c)
+
+	// user cannot borrow her/his own book
+	bookUser, err := controller.cartModel.GetBookByUserId(userId)
+	if err != nil {
+		return err
+	}
+	fmt.Println(bookUser)
+	for _, book := range bookUser {
+		fmt.Println("book owner id - user id", book.UserID, "-", userId)
+		if book.ID == cartRequest.BookDataID {
+			return c.JSON(http.StatusBadRequest, util.ResponseFail("You could not rent your own book", err))
+		}
+	}
+
+	// user cannot borrow the same book id
+	bookList, err := controller.cartModel.List(userId)
+	if err != nil {
+		return err
+	}
+	var nullTime time.Time
+	for _, book := range bookList {
+		if book.BookDataID == cartRequest.BookDataID && book.DateReturn == nullTime {
+			return c.JSON(http.StatusBadRequest, util.ResponseFail("You could not rent the same book", err))
+		}
+	}
+
 	cart := models.Cart{
 		UserID:     uint(userId),
 		BookDataID: uint(cartRequest.BookDataID),
@@ -35,13 +62,13 @@ func (controller *Controller) RentBook(c echo.Context) error {
 		DateDue:    cartRequest.DateDue,
 	}
 
-	_, err := controller.cartModel.Rent(cart)
+	updatedCart, err := controller.cartModel.Rent(cart)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Rent Book Failed", nil))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Rent Book Failed", err))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Rent Book Success", nil))
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Rent Book Success", updatedCart))
 }
 
 func (controller *Controller) ReturnBook(c echo.Context) error {
@@ -54,7 +81,6 @@ func (controller *Controller) ReturnBook(c echo.Context) error {
 	}
 
 	returnBook, err := controller.cartModel.Return(updateDate.DateReturn, userId, int(Date.BookDataID))
-
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Return Book", nil))
 	}
