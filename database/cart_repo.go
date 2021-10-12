@@ -15,8 +15,9 @@ type (
 	}
 	CartModel interface {
 		Rent(cart models.Cart) (models.Cart, error)
+		GetBookByUserId(userId int) ([]models.BookData, error)
 		Return(Date time.Time, userId, bookId int) (interface{}, error)
-		List(userId int) (interface{}, error)
+		List(userId int) ([]models.Cart, error)
 		Extend(Date time.Time, userId, bookId int) (interface{}, error)
 	}
 )
@@ -29,6 +30,15 @@ func (g *GormCartModel) Rent(cart models.Cart) (models.Cart, error) {
 	}
 
 	return cart, nil
+}
+
+func (g *GormCartModel) GetBookByUserId(userId int) ([]models.BookData, error) {
+	var bookList []models.BookData
+
+	if err := g.db.Model(&models.BookData{}).Where("user_id = ?", userId).Find(&bookList).Error; err != nil {
+		return bookList, err
+	}
+	return bookList, nil
 }
 
 // Return is methor to update return book date
@@ -62,17 +72,9 @@ func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (interface{},
 }
 
 // Return is methor to update return book date
-func (g *GormCartModel) List(userId int) (interface{}, error) {
+func (g *GormCartModel) List(userId int) ([]models.Cart, error) {
 
-	type CartView struct {
-		ID         uint
-		BookDataID uint
-		DateLoan   time.Time
-		DateDue    time.Time
-		DateReturn time.Time
-	}
-
-	var carts []CartView
+	var carts []models.Cart
 	if err := g.db.Model(&models.Cart{}).Where("user_id = ?", userId).Find(&carts).Error; err != nil {
 		return carts, err
 	}

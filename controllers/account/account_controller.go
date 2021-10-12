@@ -59,6 +59,6 @@ func (controller *Controller) BalanceTransaction(c echo.Context) error {
 	} else if code == 2 {
 		message = "Withdrawal success"
 	}
-	return c.JSON(http.StatusOK, util.ResponseSuccess(message, entryRequest.Amount))
+	return c.JSON(http.StatusOK, util.ResponseSuccess(message, entry))
 
 }
