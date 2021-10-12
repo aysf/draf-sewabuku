@@ -121,6 +121,8 @@ func (g *GormCartModel) Extend(inputDate time.Time, userId, bookId int) (interfa
 // NewCartModel is function to initialize new cart model
 func NewCartModel(db *gorm.DB) *GormCartModel {
 
+	//added trigger transaction
+
 	db.Exec(`
 	CREATE TRIGGER after_cart_insert_lender
 	AFTER INSERT ON carts
@@ -180,6 +182,14 @@ func NewCartModel(db *gorm.DB) *GormCartModel {
 		INSERT INTO entries (account_id, amount, created_at) 
 		VALUES (new.user_id, DATEDIFF(  new.date_due, new.date_loan) *(select -1*CAST(price AS SIGNED) from book_data where book_data.id = new.book_data_id), now());
 		END IF
+	`)
+
+	db.Exec(`
+	create trigger after_cart_transfer
+	after insert on carts
+	for each row 
+	insert into transfers (to_account_id, from_account_id, amount, created_at)
+	values ((select user_id from book_data bd where bd.id = new.book_data_id), new.user_id, DATEDIFF(new.date_due, new.date_loan) * (select price from book_data where book_data.id = new.book_data_id), now());
 	`)
 
 	return &GormCartModel{db: db}

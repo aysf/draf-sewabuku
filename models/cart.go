@@ -10,8 +10,8 @@ type Cart struct {
 	DateDue    time.Time `json:"date_due" form:"date_due" gorm:"not null"`
 	DateReturn time.Time `json:"date_return" form:"date_return"`
 	IsReturn   bool      `json:"is_return"`
-	User       User
-	BookData   BookData
+	User       User      `json:"-"`
+	BookData   BookData  `json:"-"`
 }
 
 type Rating struct {
