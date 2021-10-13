@@ -43,9 +43,6 @@ func (controller *Controller) RentBook(c echo.Context) error {
 
 	// check: deposit
 	var minDeposit int = int(book.Price) * 90
-	fmt.Println("RENTfee required: ", rentalFee)
-	fmt.Println("deposit required: ", minDeposit)
-	fmt.Println("deposit avail:", borrowerDeposit.Balance)
 	if minDeposit > int(borrowerDeposit.Balance) {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Your deposit should be minimum cost at 90 days of rental period", nil))
 	}
@@ -60,9 +57,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(bookUser)
 	for _, book := range bookUser {
-		fmt.Println("book owner id - user id", book.UserID, "-", userId)
 		if book.ID == cartRequest.BookDataID {
 			return c.JSON(http.StatusBadRequest, util.ResponseFail("You could not rent your own book", err))
 		}
