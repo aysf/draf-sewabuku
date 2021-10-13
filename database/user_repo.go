@@ -5,6 +5,7 @@ import (
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -243,10 +244,11 @@ func (g *GormUserModel) GetBorrowed(userId int, complete string) (Borrowed, erro
 	var user Borrowed
 	var err *gorm.DB
 
+	var nullTime time.Time
 	if complete == "true" {
-		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return IS NOT NULL", userId).Scan(&user)
+		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return <> ?", userId, nullTime).Scan(&user)
 	} else if complete == "false" {
-		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return IS NULL", userId).Scan(&user)
+		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ? AND date_return = ?", userId, nullTime).Scan(&user)
 	} else {
 		err = g.db.Raw("SELECT * FROM book_history WHERE borrower_id = ?", userId).Scan(&user)
 	}
