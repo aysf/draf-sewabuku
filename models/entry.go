@@ -4,7 +4,7 @@ import "time"
 
 type Entry struct {
 	ID        uint      `json:"-" gorm:"primaryKey"`
-	AccountID uint      `json:"-"`
+	AccountID string    `json:"-"`
 	Amount    int       `json:"amount" form:"amount"`
 	CreatedAt time.Time `json:"-"`
 	Account   Account   `json:"-"`

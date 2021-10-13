@@ -32,10 +32,10 @@ func InsertDumyData(db *gorm.DB) {
 	// ----------------
 
 	var entry = []models.Entry{
-		{AccountID: 5, Amount: 25000, CreatedAt: time.Now()},
-		{AccountID: 6, Amount: 50000, CreatedAt: time.Now()},
-		{AccountID: 7, Amount: 75000, CreatedAt: time.Now()},
-		{AccountID: 8, Amount: 100000, CreatedAt: time.Now()},
+		{AccountID: "a-1", Amount: 25000, CreatedAt: time.Now()},
+		{AccountID: "a-2", Amount: 50000, CreatedAt: time.Now()},
+		{AccountID: "a-3", Amount: 75000, CreatedAt: time.Now()},
+		{AccountID: "a-4", Amount: 100000, CreatedAt: time.Now()},
 	}
 
 	// ----------------

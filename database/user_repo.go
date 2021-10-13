@@ -1,12 +1,13 @@
 package database
 
 import (
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"os"
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type (
@@ -64,11 +65,20 @@ type (
 // NewUserModel is function to initialize new user model
 func NewUserModel(db *gorm.DB) *GormUserModel {
 
+	// create account and account_hold table
 	db.Exec(`
-	CREATE TRIGGER after_create_user
-	AFTER INSERT ON users FOR EACH ROW 
-	INSERT INTO accounts(balance, user_id)
-	VALUES (0, new.id);`)
+		CREATE TRIGGER create_account
+		AFTER INSERT ON users 
+		FOR EACH ROW 
+			INSERT INTO accounts(balance, user_id, id)
+			VALUES (0, new.id, concat_ws('-',"a",new.id));`)
+
+	db.Exec(`
+		CREATE TRIGGER create_account_hold
+		AFTER INSERT ON accounts 
+		FOR EACH ROW 
+			INSERT INTO account_holds(balance, account_id, id)
+			VALUES (0, new.id, concat_ws('-',"d", (select users.id from users where new.user_id = users.id) ));`)
 
 	db.Exec(`CREATE OR REPLACE VIEW user_profile AS
 	SELECT 	users.id,

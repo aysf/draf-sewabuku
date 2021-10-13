@@ -150,20 +150,20 @@ paths:
         - Users
       description: Get Borrowed Book
       responses:
-        '200':
-          $ref: '#/components/responses/'
-        '400':
-          $ref: '#/components/responses/'
+      #   '200':
+      #     $ref: '#/components/responses/'
+      #   '400':
+      #     $ref: '#/components/responses/'
   /users/lent:
     get:
       tags:
         - Users
       description: Get Lent Book
       responses:
-        '200':
-          $ref: '#/components/responses/'
-        '400':
-          $ref: '#/components/responses/'
+      #   '200':
+      #     # $ref: '#/components/responses/'
+      #   '400':
+      #     # $ref: '#/components/responses/'
   /users/book-rating/{cart-id}:
     post:
       tags:

@@ -12,6 +12,6 @@ func AccountPath(e *echo.Echo, accountController *account.Controller) {
 	jwtAuth := e.Group("/account")
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 
-	jwtAuth.POST("/transaction", accountController.BalanceTransaction)
-
+	jwtAuth.POST("/transaction", accountController.TopupWithdraw)
+	jwtAuth.PUT("/deposit", accountController.DepositTransfer)
 }

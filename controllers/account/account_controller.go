@@ -22,19 +22,15 @@ func NewController(accountModel database.AccountModel) *Controller {
 	}
 }
 
-func (controller *Controller) BalanceTransaction(c echo.Context) error {
+func (controller *Controller) TopupWithdraw(c echo.Context) error {
 	code, _ := strconv.Atoi(c.QueryParam("code"))
 
 	var entryRequest models.Entry
 	c.Bind(&entryRequest)
 
-	// if err := c.Bind(&entryRequest); err != nil {
-	// 	fmt.Println("error is", err)
-	// 	return c.JSON(http.StatusBadRequest, "fail")
-	// }
-
 	userId := middlewares.ExtractTokenUserId(c)
-	fmt.Println(entryRequest)
+	accountId := fmt.Sprintf("a-%d", userId)
+
 	var amount int
 	if code == 1 {
 		amount = entryRequest.Amount
@@ -43,7 +39,7 @@ func (controller *Controller) BalanceTransaction(c echo.Context) error {
 	}
 
 	entry := models.Entry{
-		AccountID: uint(userId),
+		AccountID: accountId,
 		Amount:    amount,
 	}
 
@@ -55,10 +51,25 @@ func (controller *Controller) BalanceTransaction(c echo.Context) error {
 
 	var message string
 	if code == 1 {
-		message = "Deposit success"
+		message = "Topup success"
 	} else if code == 2 {
 		message = "Withdrawal success"
 	}
 	return c.JSON(http.StatusOK, util.ResponseSuccess(message, entry))
 
+}
+
+func (controller *Controller) DepositTransfer(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+	var ammountInput models.Account
+	c.Bind(&ammountInput)
+
+	ammount := ammountInput.Balance
+
+	ammountUpdate, err := controller.accountModel.UpdateBalance(uint(userId), ammount)
+	if err != nil {
+		msg := fmt.Sprint(err)
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to make transactoin", msg))
+	}
+	return c.JSON(http.StatusOK, util.ResponseSuccess("deposit transfer success", ammountUpdate))
 }

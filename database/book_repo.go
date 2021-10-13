@@ -33,9 +33,7 @@ type (
 
 func (r *GormBookModel) GetAllBooks() ([]models.BookData, error) {
 	var books []models.BookData
-
 	querry := `SELECT b.id, b.title, b.photo, b.publish_year, b.price, b.quantity, b.description, b.user_id, u.address as "users.address", u.name as "users.name", a.name as "authors.name" ,b.author_id, p.name as "publishers.name", publisher_id, c.name as "categories.name", category_id FROM book_data b JOIN users u ON b.user_id = u.id JOIN publishers p ON b.publisher_id = p.id JOIN authors a ON b.author_id = a.id JOIN categories c ON b.category_id = c.id`
-
 	err := r.db.Preload("Author").Preload("Publisher").Preload("Category").Preload("User").Raw(querry).Find(&books).Error
 	if err != nil {
 		return books, err

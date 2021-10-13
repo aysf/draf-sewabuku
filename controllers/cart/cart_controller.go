@@ -30,7 +30,32 @@ func (controller *Controller) RentBook(c echo.Context) error {
 
 	userId := middlewares.ExtractTokenUserId(c)
 
-	// user cannot borrow her/his own book
+	// getting days rental period
+	dateLoanInput := cartRequest.DateLoan
+	dateDueInput := cartRequest.DateDue
+	days := dateDueInput.Sub(dateLoanInput).Hours() / 24
+
+	// getting book and user data
+	borrowerBalance, borrowerDeposit, _ := controller.cartModel.GetAccountByUserId(userId)
+	book, _ := controller.cartModel.GetBookByBookId(int(cartRequest.BookDataID))
+
+	rentalFee := int(days) * int(book.Price)
+
+	// check: deposit
+	var minDeposit int = int(book.Price) * 90
+	fmt.Println("RENTfee required: ", rentalFee)
+	fmt.Println("deposit required: ", minDeposit)
+	fmt.Println("deposit avail:", borrowerDeposit.Balance)
+	if minDeposit > int(borrowerDeposit.Balance) {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Your deposit should be minimum cost at 90 days of rental period", nil))
+	}
+
+	// check: balance
+	if rentalFee > int(borrowerBalance.Balance) {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Your active balance is not enough, please shorten your rental period or topup your balance", nil))
+	}
+
+	// check: user cannot borrow her/his own book
 	bookUser, err := controller.cartModel.GetBookByUserId(userId)
 	if err != nil {
 		return err
@@ -43,7 +68,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 		}
 	}
 
-	// user cannot borrow the same book id
+	// check: user cannot borrow the same book id
 	bookList, err := controller.cartModel.List(userId)
 	if err != nil {
 		return err
@@ -55,6 +80,8 @@ func (controller *Controller) RentBook(c echo.Context) error {
 		}
 	}
 
+	// if all check list passed
+
 	cart := models.Cart{
 		UserID:     uint(userId),
 		BookDataID: uint(cartRequest.BookDataID),
@@ -63,7 +90,6 @@ func (controller *Controller) RentBook(c echo.Context) error {
 	}
 
 	updatedCart, err := controller.cartModel.Rent(cart)
-
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Rent Book Failed", err))
 	}

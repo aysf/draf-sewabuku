@@ -32,8 +32,8 @@ func insertDummyData(db *gorm.DB) {
 		{Name: "Baiq", Email: "baiq@mail.com", Password: passStr, Address: "depok"},
 	}
 	var entry = []models.Entry{
-		{AccountID: 1, Amount: 25000, CreatedAt: time.Now()},
-		{AccountID: 2, Amount: 0, CreatedAt: time.Now()},
+		{AccountID: "a-1", Amount: 25000, CreatedAt: time.Now()},
+		{AccountID: "a-2", Amount: 0, CreatedAt: time.Now()},
 	}
 	var bookData = []models.BookData{
 		{Title: "Rich Dad Poor Dad", UserID: 1, Quantity: 1, Photo: "default.jpg", AuthorID: 1, PublisherID: 1, CategoryID: 1, PublishYear: 1997, Price: 5000},
