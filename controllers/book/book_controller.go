@@ -50,7 +50,7 @@ func (h *Controller) SearchAll(c echo.Context) error {
 
 	books, err := h.bookModel.SearchBooks(keyword, author, publisher, category)
 	if err != nil {
-		Response := util.ResponseError("error disini", err)
+		Response := util.ResponseError("failed to get book", err)
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
