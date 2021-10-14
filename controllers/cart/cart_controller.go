@@ -37,7 +37,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 
 	// getting book and user data
 	borrowerBalance, borrowerDeposit, _ := controller.cartModel.GetAccountByUserId(userId)
-	book, _ := controller.cartModel.GetBookByBookId(int(cartRequest.BookDataID))
+	book, _ := controller.cartModel.GetBookByBookId(cartRequest.BookDataID)
 
 	rentalFee := int(days) * int(book.Price)
 
@@ -77,6 +77,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 
 	// if all check list passed
 
+	// -- update cart
 	cart := models.Cart{
 		UserID:     uint(userId),
 		BookDataID: uint(cartRequest.BookDataID),
@@ -89,6 +90,19 @@ func (controller *Controller) RentBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Rent Book Failed", err))
 	}
 
+	// -- update balance
+	rentalFeeCharge := -rentalFee
+	if _, err := controller.cartModel.UpdateSaldo(borrowerBalance, rentalFeeCharge); err != nil {
+		msg := fmt.Sprintf("error: %s", err)
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Rent Book Failed, balance could not update", msg))
+	}
+
+	LenderId, _ := controller.cartModel.GetLenderIdByBookId(cart.BookDataID)
+	lenderBalance, _, _ := controller.cartModel.GetAccountByUserId(int(LenderId))
+	if _, err := controller.cartModel.UpdateSaldo(lenderBalance, rentalFee); err != nil {
+		msg := fmt.Sprintf("error: %s", err)
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Rent Book Failed, balance could not update", msg))
+	}
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Rent Book Success", updatedCart))
 }
 
