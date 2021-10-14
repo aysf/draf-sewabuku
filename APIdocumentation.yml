@@ -25,6 +25,8 @@ tags:
     description: User control
   - name: Books
     description: Book data management
+  - name: Carts
+    description: Book cart
   - name: Accounts
     description: All about deposit transaction
 paths:
@@ -288,6 +290,42 @@ paths:
           $ref: '#/components/responses/getListAuthorSuccess'
         '400':
           $ref: '#/components/responses/getListAuthorFailed'
+  #
+  ####################################
+  #  CARTS
+  ####################################
+  /carts/rent:
+    post:
+      tags:
+        - Carts
+      description: Rent Book
+      ## requestbody
+      responses:
+
+  /carts/return:
+    put:
+      tags:
+        - Carts
+      description: Return Book
+      ## requestbody
+      responses:
+
+  /carts/extend:
+    put:
+      tags:
+        - Carts
+      description: Extend Rent Book
+      ## requestbody
+      responses:
+
+  /carts:
+    post:
+      tags:
+        - Carts
+      description: Get List Book on Cart
+      ## requestbody
+      responses:
+
   #
   ####################################
   #  ACCOUNTS
@@ -932,15 +970,3 @@ components:
               message:
                 type: string
                 example: Fail to Create Transaction
-
-
-
-
-
-
-
-
-  #----------------------------------#
-  #    SCHEMAS
-  #----------------------------------#
-
