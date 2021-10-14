@@ -100,5 +100,9 @@ func DBConnectTest() *gorm.DB {
 		panic("could not connect database")
 	}
 
+	DBMigrate(db)
+
+	InsertDumyData(db)
+
 	return db
 }

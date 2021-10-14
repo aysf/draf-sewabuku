@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,6 +18,14 @@ import (
 	m "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 )
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
 
 type userResponse struct {
 	Status  string      `json:"status"`
@@ -36,7 +45,7 @@ func TestController_RegisterUserController(t *testing.T) {
 	}{
 		{
 			name:            "test1",
-			reqBody:         map[string]string{"name": "kuuga", "email": "kamen@rider.jp", "password": "kuuga99", "address": "japan"},
+			reqBody:         map[string]string{"name": "kuuga", "organization_name": "Kamen Rider", "email": "kamen@rider.jp", "password": "kuuga99", "address": "japan"},
 			expectCode:      http.StatusOK,
 			responseStatus:  "success",
 			responseMessage: "Register Success",
@@ -61,17 +70,20 @@ func TestController_RegisterUserController(t *testing.T) {
 	db := config.DBConnectTest()
 
 	// Drop and create new table
-	db.Migrator().DropTable(
-		&models.Account{},
-		&models.User{},
-	)
-	db.AutoMigrate(
-		&models.Account{},
-		&models.User{},
-	)
+	//db.Migrator().DropTable(
+	//	&models.Account{},
+	//	&models.User{},
+	//)
+	//db.AutoMigrate(
+	//	&models.Account{},
+	//	&models.User{},
+	//)
 
 	// Initialize server
 	e := echo.New()
+
+	// Add validator module
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Initialize user model
 	modelUser := database.NewUserModel(db)
@@ -81,7 +93,6 @@ func TestController_RegisterUserController(t *testing.T) {
 
 	// Process all test cases
 	for _, testCase := range testCases {
-		fmt.Println("------------>", testCase.name)
 		if testCase.name == "test3" {
 			db.Migrator().DropTable(
 				&models.User{},
@@ -89,7 +100,6 @@ func TestController_RegisterUserController(t *testing.T) {
 			)
 		}
 		body, _ := json.Marshal(testCase.reqBody)
-		fmt.Println("==============request")
 		fmt.Println(testCase.reqBody)
 		req := httptest.NewRequest(echo.POST, "/users/register", bytes.NewBuffer(body))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -98,7 +108,6 @@ func TestController_RegisterUserController(t *testing.T) {
 		if assert.NoError(t, controllerUser.RegisterUserController(ctx)) {
 			resBody := res.Body.String()
 
-			fmt.Println("==============response")
 			fmt.Println(resBody)
 
 			var response userResponse
@@ -140,8 +149,8 @@ func TestController_LoginUserController(t *testing.T) {
 	db := config.DBConnectTest()
 
 	// Drop and create new table
-	db.Migrator().DropTable(&models.User{})
-	db.AutoMigrate(&models.User{})
+	//db.Migrator().DropTable(&models.User{})
+	//db.AutoMigrate(&models.User{})
 
 	// Prepare dummy data
 	newUser := models.User{
@@ -209,22 +218,6 @@ func TestController_GetUserProfileController(t *testing.T) {
 	// Initialize database connection
 	db := config.DBConnectTest()
 
-	// Drop and create new table
-	db.Migrator().DropTable(&models.User{})
-	db.AutoMigrate(&models.User{})
-
-	// Prepare dummy data
-	newUser := models.User{
-		Name:     "Test Login",
-		Email:    "test1@test.com",
-		Password: "1234pass",
-	}
-	registerModel := database.NewUserModel(db)
-	_, err := registerModel.Register(newUser)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	// Create token
 	token, _ := middlewares.CreateToken(1)
 
@@ -278,17 +271,10 @@ func TestController_UpdateUserProfileController(t *testing.T) {
 		},
 		{
 			name:            "test2",
-			reqBody:         map[string]string{"email": "ubahemail@com"},
-			expectCode:      http.StatusInternalServerError,
-			responseStatus:  "error",
-			responseMessage: "Check Your Input",
-		},
-		{
-			name:            "test3",
 			reqBody:         map[string]string{"name": "Yuri"},
-			expectCode:      http.StatusInternalServerError,
-			responseStatus:  "error",
-			responseMessage: "Check Your Input",
+			expectCode:      http.StatusBadRequest,
+			responseStatus:  "fail",
+			responseMessage: "Fail to Update User Profile",
 		},
 	}
 
@@ -296,8 +282,8 @@ func TestController_UpdateUserProfileController(t *testing.T) {
 	db := config.DBConnectTest()
 
 	// Drop and create new table
-	db.Migrator().DropTable(&models.User{})
-	db.AutoMigrate(&models.User{})
+	//db.Migrator().DropTable(&models.User{})
+	//db.AutoMigrate(&models.User{})
 
 	// Prepare dummy data
 	newUser := models.User{
@@ -326,7 +312,7 @@ func TestController_UpdateUserProfileController(t *testing.T) {
 	// Process all test cases
 	for _, testCase := range testCases {
 		body, _ := json.Marshal(testCase.reqBody)
-		req := httptest.NewRequest(echo.GET, "/users/profile", bytes.NewBuffer(body))
+		req := httptest.NewRequest(echo.POST, "/users/profile", bytes.NewBuffer(body))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
 		if testCase.name == "test2" {
@@ -346,3 +332,84 @@ func TestController_UpdateUserProfileController(t *testing.T) {
 		}
 	}
 }
+
+func TestController_UpdatePasswordController(t *testing.T) {
+	//Initialize test cases
+	var testCases = []struct {
+		name            string
+		reqBody         map[string]string
+		expectCode      int
+		responseStatus  string
+		responseMessage string
+	}{
+		{
+			name:            "test1",
+			reqBody:         map[string]string{"password": "newPass"},
+			expectCode:      http.StatusOK,
+			responseStatus:  "success",
+			responseMessage: "Success Change Password",
+		},
+		{
+			name:            "test2",
+			reqBody:         map[string]string{"password": ""},
+			expectCode:      http.StatusBadRequest,
+			responseStatus:  "fail",
+			responseMessage: "Fail to Change Password",
+		},
+	}
+
+	// Initialize database connection
+	db := config.DBConnectTest()
+
+	// Drop and create new table
+	//db.Migrator().DropTable(&models.User{})
+	//db.AutoMigrate(&models.User{})
+
+	// Prepare dummy data
+	newUser := models.User{
+		Name:     "Test Login",
+		Email:    "test1@test.com",
+		Password: "1234pass",
+	}
+	registerModel := database.NewUserModel(db)
+	_, err := registerModel.Register(newUser)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Create token
+	token, _ := middlewares.CreateToken(1)
+
+	// Initialize server
+	e := echo.New()
+
+	// Initialize user model
+	modelUser := database.NewUserModel(db)
+
+	// Initialize user controller
+	controllerUser := NewController(modelUser)
+
+	// Process all test cases
+	for _, testCase := range testCases {
+		body, _ := json.Marshal(testCase.reqBody)
+		req := httptest.NewRequest(echo.POST, "/users/change-password", bytes.NewBuffer(body))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+		if testCase.name == "test2" {
+			db.Migrator().DropTable(&models.User{})
+		}
+		res := httptest.NewRecorder()
+		ctx := e.NewContext(req, res)
+		if assert.NoError(t, m.JWT([]byte(os.Getenv("SECRET_KEY")))(controllerUser.GetUserProfileController)(ctx)) {
+			resBody := res.Body.String()
+
+			var response userResponse
+			json.Unmarshal([]byte(resBody), &response)
+
+			assert.Equal(t, testCase.expectCode, res.Code)
+			assert.Equal(t, testCase.responseStatus, response.Status)
+			assert.Equal(t, testCase.responseMessage, response.Message)
+		}
+	}
+}
+
