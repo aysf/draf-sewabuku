@@ -330,25 +330,26 @@ paths:
   ####################################
   #  ACCOUNTS
   ####################################
-  /account:
-    get:
-      tags:
-        - Accounts
-      description: return all transaction history
-      responses:
-        '200':
-          $ref: '#/components/responses/getTransactionSuccess'
-        '400':
-          $ref: '#/components/responses/getTransactionFailed'
+  /account/deposit:
     post:
       tags:
         - Accounts
       description: make deposit
+      #requestBody:
+
       responses:
         '200':
           $ref: '#/components/responses/createTransactionSuccess'
         '400':
           $ref: '#/components/responses/createTransactionSuccess'
+  /account/transaction:
+    put:
+      tags:
+        - Accounts
+      description: topup withdraw
+      #requestBody:
+
+      responses:
 
 components:
   responses:
