@@ -9,11 +9,9 @@ import (
 )
 
 func AccountPath(e *echo.Echo, accountController *account.Controller) {
-	jwtAuth := e.Group("")
+	jwtAuth := e.Group("/account")
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 
-	jwtAuth.GET("/account", accountController.ShowAccountBalance)
-
-	jwtAuth.POST("/account", accountController.AddEntries)
-
+	jwtAuth.POST("/transaction", accountController.TopupWithdraw)
+	jwtAuth.PUT("/deposit", accountController.DepositTransfer)
 }

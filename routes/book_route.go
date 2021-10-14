@@ -8,24 +8,33 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func BookPath(e *echo.Echo, bookController *book.ControllerBook) {
+func BookPath(e *echo.Echo, bookController *book.Controller) {
 	bookGroup := e.Group("/books")
 	jwtAuth := e.Group("/books")
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 	// bookGroup.GET("", bookController.GetAllBookController)
 
-	bookGroup.GET("/category", bookController.GetByCategory)
+	bookGroup.GET("/search/:keyword", bookController.SearchAll)
 
-	bookGroup.GET("/name", bookController.GetBookByname)
+	bookGroup.GET("/all", bookController.GetAllBooks)
 
-	bookGroup.GET("/author", bookController.GetByAuthor)
+	bookGroup.GET("/search", bookController.FilterAuthorCategoryPublisher)
 
-	bookGroup.GET("/publisher", bookController.GetByPublisher)
+	bookGroup.GET("/listauthor", bookController.GetListAuthor)
 
-	jwtAuth.POST("/book", bookController.InsertBook)
+	bookGroup.GET("/listcategory", bookController.GetListCategory)
 
-	jwtAuth.PUT("/book", bookController.UpdateBook)
+	bookGroup.GET("/listpublisher", bookController.GetListPublisher)
 
-	jwtAuth.DELETE("/book", bookController.DeleteBook)
+	bookGroup.GET("/details/:id", bookController.GetDetailsBook)
 
+	bookGroup.GET("/comment/:id", bookController.GetCommentBookID)
+
+	jwtAuth.POST("/newauthor", bookController.CreateNewAuthor)
+
+	jwtAuth.POST("/newpublisher", bookController.CreateNewPublisher)
+
+	jwtAuth.PUT("/bookphoto/:id", bookController.UpdatePhotoBook)
+
+	jwtAuth.POST("/newbook", bookController.InsertBook)
 }

@@ -4,19 +4,33 @@ import (
 	"os"
 	"sewabuku/controllers/user"
 
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/labstack/echo/v4"
 )
 
 func UserPath(e *echo.Echo, userController *user.Controller) {
-	jwtAuth := e.Group("")
+	noAuth := e.Group("/users")
+	jwtAuth := e.Group("/users")
 	jwtAuth.Use(middleware.JWT([]byte(os.Getenv("SECRET_KEY"))))
 
-	e.POST("/users/register", userController.RegisterUserController)
+	noAuth.POST("/register", userController.RegisterUserController)
 
-	e.POST("/users/login", userController.LoginUserController)
+	noAuth.POST("/login", userController.LoginUserController)
 
-	jwtAuth.GET("/users/profile", userController.GetUserProfileController)
+	jwtAuth.GET("/profile", userController.GetUserProfileController)
 
-	jwtAuth.GET("/users/change-password", userController.UpdatePasswordController)
+	jwtAuth.PUT("/profile", userController.UpdateUserProfileController)
+
+	jwtAuth.PUT("/change-password", userController.UpdatePasswordController)
+
+	jwtAuth.PUT("/logout", userController.LogoutUserController)
+
+	jwtAuth.GET("/cart", userController.GetBorrowedController)
+
+	jwtAuth.GET("/books", userController.GetLentController)
+
+	jwtAuth.PUT("/book-rating/:id/", userController.InsertRatingBookController)
+
+	jwtAuth.PUT("/borrower-rating/:id/", userController.InsertRatingBorrowerController)
 }

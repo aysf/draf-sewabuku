@@ -1,10 +1,13 @@
 package account
 
 import (
+	"fmt"
 	"net/http"
 	"sewabuku/database"
 	"sewabuku/middlewares"
 	"sewabuku/models"
+	"sewabuku/util"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,34 +22,54 @@ func NewController(accountModel database.AccountModel) *Controller {
 	}
 }
 
-func (controller *Controller) ShowAccountBalance(c echo.Context) error {
-	userId := middlewares.ExtractTokenUserId(c)
-	account, err := controller.accountModel.Show(userId)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+func (controller *Controller) TopupWithdraw(c echo.Context) error {
+	code, _ := strconv.Atoi(c.QueryParam("code"))
 
-	return c.JSON(http.StatusOK, account.Balance)
-}
-
-func (controller *Controller) AddEntries(c echo.Context) error {
 	var entryRequest models.Entry
-
-	if err := c.Bind(&entryRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, "fail")
-	}
+	c.Bind(&entryRequest)
 
 	userId := middlewares.ExtractTokenUserId(c)
-	entry := models.Entry{
-		AccountID: uint(userId),
-		Amount:    entryRequest.Amount,
+	accountId := fmt.Sprintf("a-%d", userId)
+
+	var amount int
+	if code == 1 {
+		amount = entryRequest.Amount
+	} else if code == 2 {
+		amount = -1 * entryRequest.Amount
 	}
 
-	_, err := controller.accountModel.Add(entry)
+	entry := models.Entry{
+		AccountID: accountId,
+		Amount:    amount,
+	}
+
+	_, err := controller.accountModel.Transaction(entry)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "internal server error")
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	var message string
+	if code == 1 {
+		message = "Topup success"
+	} else if code == 2 {
+		message = "Withdrawal success"
+	}
+	return c.JSON(http.StatusOK, util.ResponseSuccess(message, entry))
+
+}
+
+func (controller *Controller) DepositTransfer(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+	var ammountInput models.Account
+	c.Bind(&ammountInput)
+
+	ammount := ammountInput.Balance
+
+	ammountUpdate, err := controller.accountModel.UpdateBalance(uint(userId), ammount)
+	if err != nil {
+		msg := fmt.Sprint(err)
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to make transactoin", msg))
+	}
+	return c.JSON(http.StatusOK, util.ResponseSuccess("deposit transfer success", ammountUpdate))
 }

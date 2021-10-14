@@ -1,3 +1,7 @@
+# sewabuku
+
+![Sewabuku – Lent and Borrow Book API](https://raw.githubusercontent.com/tegarap/sewabuku-doc-assets/main/banner.png)
+
 ## Getting Strated
 
 add `.env` file in the root repository, for example:
@@ -6,7 +10,9 @@ add `.env` file in the root repository, for example:
 DB_USERNAME=username
 DB_PASSWORD=pasword
 DB_NAME=sewabuku
+DB_NAME_TEST=dbtest
 SECRET_KEY=secret123
+BCRYPT_COST=14
 ```
 
 download some packages in `go.mod` using command `go get url/to/package`

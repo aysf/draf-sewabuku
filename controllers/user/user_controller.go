@@ -6,6 +6,7 @@ import (
 	"sewabuku/middlewares"
 	"sewabuku/models"
 	"sewabuku/util"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,16 +27,22 @@ func (controller *Controller) RegisterUserController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
+	if err := c.Validate(userRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Check Your Input", nil))
+	}
+
 	user := models.User{
-		Name:     userRequest.Name,
-		Email:    userRequest.Email,
-		Password: userRequest.Password,
+		Name:             userRequest.Name,
+		OrganizationName: userRequest.OrganizationName,
+		Email:            userRequest.Email,
+		Password:         userRequest.Password,
+		Address:          userRequest.Address,
 	}
 
 	_, err := controller.userModel.Register(user)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Register Failed", nil))
+		return c.JSON(http.StatusInternalServerError, util.ResponseError("Register Failed", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Register Success", nil))
@@ -49,13 +56,19 @@ func (controller *Controller) LoginUserController(c echo.Context) error {
 	user, err := controller.userModel.Login(userRequest.Email, userRequest.Password)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", err.Error()))
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Login Failed", nil))
 	}
 
-	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", "token: "+user.Token))
+	token := struct {
+		Token string `json:"token"`
+	}{
+		Token: user.Token,
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Login Success", token))
 }
 
-// GetUserProfileController is controller for user profile
+// GetUserProfileController is controller for get user profile
 func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
 
@@ -68,6 +81,21 @@ func (controller *Controller) GetUserProfileController(c echo.Context) error {
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get User Profile", user))
 }
 
+// UpdateUserProfileController is controller for user edit their profile
+func (controller *Controller) UpdateUserProfileController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+	var userRequest models.User
+	c.Bind(&userRequest)
+
+	_, err := controller.userModel.UpdateProfile(userRequest, userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Update User Profile", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Update Profile", nil))
+}
+
 // UpdatePasswordController is controller for user edit their password
 func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	userId := middlewares.ExtractTokenUserId(c)
@@ -75,9 +103,98 @@ func (controller *Controller) UpdatePasswordController(c echo.Context) error {
 	var userRequest models.User
 	c.Bind(&userRequest)
 
-	if _, err := controller.userModel.UpdatePassword(userRequest, userId); err != nil {
+	user := models.User{Password: userRequest.Password}
+
+	if _, err := controller.userModel.UpdatePassword(user, userId); err != nil {
 		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Change Password", nil))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Change Password", nil))
+}
+
+// LogoutUserController is controller for user log out
+func (controller *Controller) LogoutUserController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	_, err := controller.userModel.Logout(userId)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Logout Failed", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Logout Success", nil))
+}
+
+// GetBorrowedController is controller for get borrowed book
+func (controller *Controller) GetBorrowedController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetBorrowed(userId, complete)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Borrowed Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Borrowed Book", user))
+}
+
+// GetLentController is controller for get borrowed book
+func (controller *Controller) GetLentController(c echo.Context) error {
+	userId := middlewares.ExtractTokenUserId(c)
+
+	complete := c.QueryParam("complete")
+
+	user, err := controller.userModel.GetLent(userId, complete)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Get Lent Book", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Get Lent Book", user))
+}
+
+//InsertRatingBookController is controller for insert rating book
+func (controller *Controller) InsertRatingBookController(c echo.Context) error {
+	var rating models.Rating
+	c.Bind(&rating)
+
+	cartId, _ := strconv.Atoi(c.Param("id"))
+
+	insertRating := models.Rating{
+		CartID:       uint(cartId),
+		RateBook:     rating.RateBook,
+		DescRateBook: rating.DescRateBook,
+	}
+
+	_, err := controller.userModel.InsertRating(insertRating)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Give Book Rating", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Give Book Rating", nil))
+}
+
+//InsertRatingBorrowerController is controller for insert rating book
+func (controller *Controller) InsertRatingBorrowerController(c echo.Context) error {
+	var rating models.Rating
+	c.Bind(&rating)
+
+	cartId, _ := strconv.Atoi(c.Param("id"))
+
+	insertRating := models.Rating{
+		CartID:           uint(cartId),
+		RateBorrower:     rating.RateBorrower,
+		DescRateBorrower: rating.DescRateBorrower,
+	}
+
+	_, err := controller.userModel.InsertRating(insertRating)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Give Borrower Rating", nil))
+	}
+
+	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Give Borrower Rating", nil))
 }

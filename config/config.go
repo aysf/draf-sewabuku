@@ -19,11 +19,15 @@ func DBConnect() *gorm.DB {
 	}
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	connectionString :=
-		fmt.Sprintf("%s:%s@/%s?parseTime=true",
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			dbUsername,
 			dbPassword,
+			dbHost,
+			dbPort,
 			dbName,
 		)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
@@ -38,13 +42,28 @@ func DBConnect() *gorm.DB {
 }
 
 func DBMigrate(db *gorm.DB) {
+	db.Migrator().DropTable(&models.User{})
+	db.Migrator().DropTable(&models.Cart{})
+	db.Migrator().DropTable(&models.BookData{})
+	db.Migrator().DropTable(&models.Author{})
+	db.Migrator().DropTable(&models.Category{})
+	db.Migrator().DropTable(&models.Publisher{})
+	db.Migrator().DropTable(&models.Account{})
+	db.Migrator().DropTable(&models.AccountHold{})
+	db.Migrator().DropTable(&models.Entry{})
+	db.Migrator().DropTable(&models.Rating{})
+	db.Migrator().DropTable(&models.Transfers{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Cart{})
 	db.AutoMigrate(&models.BookData{})
-	db.AutoMigrate(&models.Catagory{})
+	db.AutoMigrate(&models.Author{})
+	db.AutoMigrate(&models.Category{})
+	db.AutoMigrate(&models.Publisher{})
 	db.AutoMigrate(&models.Account{})
-	db.AutoMigrate(&models.Transfers{})
+	db.AutoMigrate(&models.AccountHold{})
 	db.AutoMigrate(&models.Entry{})
+	db.AutoMigrate(&models.Rating{})
+	db.AutoMigrate(&models.Transfers{})
 }
 
 //-------------------------------------------------------
@@ -62,12 +81,16 @@ func DBConnectTest() *gorm.DB {
 	}
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
 	dbNameTest := os.Getenv("DB_NAME_TEST")
 	connectionString :=
-		fmt.Sprintf("%s:%s@/%s?parseTime=true",
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			dbUsername,
 			dbPassword,
-			dbNameTest,
+			dbHost,
+			dbPort,
+			dbName,
 		)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{
 		SkipDefaultTransaction: true,

@@ -4,8 +4,8 @@ import "time"
 
 type Transfers struct {
 	ID            uint
-	ToAccountId   uint
-	FromAccountId uint
-	Amount        uint
+	ToAccountId   string
+	FromAccountId string
+	Amount        int
 	CreatedAt     time.Time
 }
