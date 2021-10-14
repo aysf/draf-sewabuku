@@ -81,12 +81,16 @@ func DBConnectTest() *gorm.DB {
 	}
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
 	dbNameTest := os.Getenv("DB_NAME_TEST")
 	connectionString :=
-		fmt.Sprintf("%s:%s@/%s?parseTime=true",
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			dbUsername,
 			dbPassword,
-			dbNameTest,
+			dbHost,
+			dbPort,
+			dbName,
 		)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{
 		SkipDefaultTransaction: true,
