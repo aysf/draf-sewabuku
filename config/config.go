@@ -90,7 +90,7 @@ func DBConnectTest() *gorm.DB {
 			dbPassword,
 			dbHost,
 			dbPort,
-			dbName,
+			dbNameTest,
 		)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{
 		SkipDefaultTransaction: true,
