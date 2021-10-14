@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -141,9 +143,9 @@ func TestSearch(t *testing.T) {
 		{
 			testName:   "test pertama",
 			keyword:    "black",
-			author:     "8",
-			category:   "6",
-			publisher:  "1",
+			author:     "7",
+			category:   "3",
+			publisher:  "6",
 			expectCode: http.StatusOK,
 			expectMsg:  "success get books",
 		}, {
@@ -153,15 +155,13 @@ func TestSearch(t *testing.T) {
 			expectMsg:  "theres no book found",
 		}, {
 			testName:   "test3",
-			keyword:    "Langit",
-			author:     "6",
-			publisher:  "3",
+			keyword:    "Kambing",
 			expectCode: 200,
 			expectMsg:  "success get books",
 		},
 	}
 	for _, testCase := range testCases {
-		fmt.Printf("test case =======================================================no %s", testCase.testName)
+		fmt.Printf("test case =======================================================no ================================================ %s", testCase.testName)
 		req := httptest.NewRequest(http.MethodGet, "/books/search/", nil)
 		res := httptest.NewRecorder()
 		q := req.URL.Query()
@@ -214,6 +214,16 @@ func TestGetDetailsBook(t *testing.T) {
 			bookid:       "2",
 			expctedMSg:   "success get details book",
 			expectedCode: 200,
+		}, {
+			name:         "test3",
+			bookid:       "20",
+			expctedMSg:   "there's no book found",
+			expectedCode: 400,
+		}, {
+			name:         "test4",
+			bookid:       ",,20",
+			expctedMSg:   "internal error",
+			expectedCode: 400,
 		},
 	}
 
@@ -293,12 +303,21 @@ func TestGetAuthor(t *testing.T) {
 
 	for _, testCase := range testCases {
 		req := httptest.NewRequest(http.MethodGet, "/books/listauthor", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 		res := httptest.NewRecorder()
 		c := e.NewContext(req, res)
 		err := bookHandler.GetListAuthor(c)
 		assert.NoError(t, err)
+
+		fmt.Println(res)
+		resBOdy := res.Body.Bytes()
+		var response bookResponse
+		err = json.Unmarshal(resBOdy, &response)
+		assert.NoError(t, err)
+
 		if assert.NoError(t, bookHandler.GetListAuthor(c)) {
 			assert.Equal(t, testCase.expectedCode, res.Code)
+			assert.Equal(t, testCase.ExpectMsg, response.Message)
 		}
 
 	}
@@ -328,8 +347,15 @@ func TestGetCategory(t *testing.T) {
 		c := e.NewContext(req, res)
 		err := bookHandler.GetListCategory(c)
 		assert.NoError(t, err)
+
+		var response bookResponse
+		resBody := res.Body.Bytes()
+		err = json.Unmarshal(resBody, &response)
+
+		assert.NoError(t, err)
 		if assert.NoError(t, bookHandler.GetListCategory(c)) {
 			assert.Equal(t, testCase.expectedCode, res.Code)
+			assert.Equal(t, testCase.ExpectMsg, response.Message)
 		}
 
 	}
@@ -365,12 +391,32 @@ func TestInsertBook(t *testing.T) {
 			Req:          map[string]interface{}{"title": "meteor", "description": "bismillah", "price": 100, "quantity": 1, "publisher_id": 2},
 			token:        token3,
 			expectedCode: 422,
+			expectedMsg:  "can not insert new book if you are still borrowing someone`s book",
+		}, {
+			name:         "test4",
+			Req:          map[string]interface{}{"publish_year": 2009, "description": "bismillah", "price": 100, "quantity": 1, "publisher_id": 2},
+			token:        token1,
+			expectedCode: 422,
 			expectedMsg:  "please input name of your book and year of publishment of your book",
+		}, {
+			name:         "test5",
+			Req:          map[string]interface{}{"title": "mengejar mimpi", "description": "bismillah", "price": 100, "quantity": "1"},
+			token:        token1,
+			expectedCode: 500,
+			expectedMsg:  "error internal",
+		}, {
+			name:         "test6",
+			Req:          map[string]interface{}{"title": "mengejar mimpi", "publish_year": 2009, "description": "bismillah", "price": 100, "quantity": 1, "publisher_id": 30},
+			token:        token1,
+			expectedCode: 422,
+			expectedMsg:  "failed to insert book",
 		},
 	}
 
 	for _, testCase := range testCases {
-		reqBody, _ := json.Marshal(testCase.Req)
+		fmt.Printf("================================================%s====================", testCase.name)
+		reqBody, err := json.Marshal(testCase.Req)
+		assert.NoError(t, err)
 		req := httptest.NewRequest(http.MethodPost, "/books/newbook", bytes.NewBuffer(reqBody))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", testCase.token))
@@ -402,7 +448,7 @@ func TestCreateNewAuthor(t *testing.T) {
 	}{
 		{
 			nameTest:     "test pertama",
-			req:          "sarah wijayantia lestaluhu",
+			req:          "sarah wijayanti",
 			token:        token1,
 			expectedCode: 200,
 			expectedMsg:  "successfully create new author",
@@ -414,10 +460,16 @@ func TestCreateNewAuthor(t *testing.T) {
 			expectedMsg:  "cannot create new author if there are special characters",
 		}, {
 			nameTest:     "test3",
-			req:          "tere liye",
+			req:          "sarah wijayanti",
 			token:        token3,
 			expectedCode: 422,
 			expectedMsg:  "cannot input name author with same name which already exist",
+		}, {
+			nameTest:     "test4",
+			req:          "",
+			token:        token3,
+			expectedCode: 422,
+			expectedMsg:  "please input author name",
 		},
 	}
 
@@ -462,7 +514,7 @@ func TestCreateNewPublisher(t *testing.T) {
 			ExpectedMsg: "cannot input name author with same name which already exist",
 		}, {
 			nameTest:    "test2",
-			Request:     "baruajacobayaa",
+			Request:     "baruajacobayaaaa",
 			token:       token1,
 			expectdCode: 200,
 			ExpectedMsg: "successfully create new publisher",
@@ -472,6 +524,12 @@ func TestCreateNewPublisher(t *testing.T) {
 			token:       token1,
 			expectdCode: 422,
 			ExpectedMsg: "cannot create new author if there are special characters",
+		}, {
+			nameTest:    "test3",
+			Request:     "",
+			token:       token1,
+			expectdCode: 422,
+			ExpectedMsg: "please input publisher name",
 		},
 	}
 
@@ -497,68 +555,125 @@ func TestCreateNewPublisher(t *testing.T) {
 	}
 }
 
-// func TestUpdatePhotoBook(t *testing.T) {
+func TestUpdatePhotoBook(t *testing.T) {
 
-// 	token1, _ := middlewares.CreateToken(1)
-// 	token2, _ := middlewares.CreateToken(2)
+	token1, _ := middlewares.CreateToken(1)
+	token2, _ := middlewares.CreateToken(2)
 
-// 	testCases := []struct {
-// 		nameTest     string
-// 		token        string
-// 		bookid       string
-// 		ReqFile      string
-// 		expectdMsg   string
-// 		expectedCode int
-// 	}{
-// 		{
-// 			nameTest:     "test1",
-// 			token:        token1,
-// 			ReqFile:      "/home/rjandoni/Desktop/draf-sewabuku/image/4,1.png",
-// 			bookid:       "5",
-// 			expectdMsg:   "successfully update books photo",
-// 			expectedCode: 200,
-// 		}, {
-// 			nameTest:     "test2",
-// 			token:        token2,
-// 			bookid:       "1",
-// 			ReqFile:      "/home/rjandoni/Downloads/bwa-storegg-server.zip",
-// 			expectdMsg:   "failed",
-// 			expectedCode: 422,
-// 		},
-// 	}
+	testCases := []struct {
+		nameTest     string
+		token        string
+		bookid       string
+		ReqFile      string
+		expectdMsg   string
+		expectedCode int
+	}{
+		{
+			nameTest:     "test1",
+			token:        token1,
+			ReqFile:      "../../testimage/test.png",
+			bookid:       ",1",
+			expectdMsg:   "error internal",
+			expectedCode: 500,
+		}, {
+			nameTest:     "test2",
+			token:        token2,
+			bookid:       "1",
+			ReqFile:      "/home/rjandoni/Downloads/bwa-storegg-server.png",
+			expectdMsg:   "you are not owner of this book",
+			expectedCode: 422,
+		},
+	}
 
-// 	for _, test := range testCases {
-// 		fmt.Printf("================================   %s   =========================", test.nameTest)
-// 		pr, pw := io.Pipe()
+	for _, test := range testCases {
+		fmt.Printf("================================   %s   =========================", test.nameTest)
+		path := test.ReqFile
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		part, err := writer.CreateFormFile("file", path)
+		assert.NoError(t, err)
+		sample, err := os.Open(path)
+		assert.NoError(t, err)
 
-// 		writer := multipart.NewWriter(pw)
+		_, err = io.Copy(part, sample)
+		assert.NoError(t, err)
+		assert.NoError(t, writer.Close())
 
-// 		go func() {
-// 			defer writer.Close()
+		f := url.Values{}
+		f.Set("file", test.ReqFile)
+		req := httptest.NewRequest(http.MethodPut, "/books/bookphoto", strings.NewReader(f.Encode()))
+		req.Header.Add("Content-Type", "multipart/form-data")
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Add(echo.HeaderContentType, writer.FormDataContentType())
+		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", test.token))
 
-// 			part, err := writer.CreateFormFile("file", test.ReqFile)
-// 			assert.NoError(t, err)
+		res := httptest.NewRecorder()
 
-// 			err = png.Encode(part, nil)
-// 			assert.NoError(t, err)
+		ctx := e.NewContext(req, res)
+		ctx.Param("/:id")
+		ctx.SetParamNames("id")
+		ctx.SetParamValues(test.bookid)
 
-// 		}()
+		if assert.NoError(t, m.JWT([]byte(os.Getenv("SECRET_KEY")))(bookHandler.UpdatePhotoBook)(ctx)) {
+			fmt.Println(res)
+			var response bookResponse
+			resBody := res.Body.Bytes()
+			err := json.Unmarshal(resBody, &response)
+			assert.Nil(t, err)
+			assert.Equal(t, test.expectdMsg, response.Message)
+			assert.Equal(t, test.expectedCode, res.Code)
+		}
+	}
 
-// 		req := httptest.NewRequest(http.MethodPut, "/books/bookphoto/", pr)
-// 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", test.token))
-// 		req.Header.Add(echo.HeaderContentType, writer.FormDataContentType())
+}
 
-// 		res := httptest.NewRecorder()
+func TestGetComment(t *testing.T) {
+	testCases := []struct {
+		nameTest     string
+		request      string
+		expectedMsg  string
+		expectedCode int
+	}{
+		{
+			nameTest:     "test 1",
+			request:      "10",
+			expectedMsg:  "successfully get book comments",
+			expectedCode: 200,
+		}, {
+			nameTest:     "test2",
+			request:      "5",
+			expectedMsg:  "theres no any comment for this book yet",
+			expectedCode: 200,
+		}, {
+			nameTest:     "test3",
+			request:      "7",
+			expectedMsg:  "successfully get book comments",
+			expectedCode: 200,
+		}, {
+			nameTest:     "test4",
+			request:      ",7",
+			expectedMsg:  "error internal",
+			expectedCode: 500,
+		},
+	}
 
-// 		ctx := e.NewContext(req, res)
-// 		ctx.Param("/:id")
-// 		ctx.SetParamNames("id")
-// 		ctx.SetParamValues(test.bookid)
+	for _, testcase := range testCases {
 
-// 		if assert.NoError(t, m.JWT([]byte(os.Getenv("SECRET_KEY")))(bookHandler.UpdatePhotoBook)(ctx)) {
-// 			fmt.Println(res)
-// 			assert.Equal(t, test.expectedCode, res.Code)
-// 		}
-// 	}
+		req := httptest.NewRequest(http.MethodGet, "/books/comment/", nil)
+		res := httptest.NewRecorder()
+		ctx := e.NewContext(req, res)
+		ctx.SetPath("/:id")
+		ctx.SetParamNames("id")
+		ctx.SetParamValues(testcase.request)
 
-// }
+		if assert.NoError(t, bookHandler.GetCommentBookID(ctx)) {
+			fmt.Println(res)
+			resBody := res.Body.Bytes()
+			var response bookResponse
+			err := json.Unmarshal(resBody, &response)
+			assert.NoError(t, err)
+			assert.Equal(t, testcase.expectedCode, res.Code)
+			assert.Equal(t, testcase.expectedMsg, response.Message)
+		}
+	}
+}
