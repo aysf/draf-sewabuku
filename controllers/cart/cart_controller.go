@@ -118,7 +118,8 @@ func (controller *Controller) ReturnBook(c echo.Context) error {
 
 	returnBook, err := controller.cartModel.Return(updateDate.DateReturn, userId, int(Date.BookDataID))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Return Book", nil))
+		msg := fmt.Sprintf("error message: %s", err)
+		return c.JSON(http.StatusBadRequest, util.ResponseFail("Fail to Return Book", msg))
 	}
 
 	return c.JSON(http.StatusOK, util.ResponseSuccess("Success Return Book", returnBook))
