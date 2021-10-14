@@ -38,7 +38,7 @@ func (h *Controller) GetAllBooks(c echo.Context) error {
 
 	responseBook := FormatResponseBooks(books)
 
-	response := util.ResponseSuccess("success", responseBook)
+	response := util.ResponseSuccess("success get all books", responseBook)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -54,8 +54,12 @@ func (h *Controller) SearchAll(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
+	if len(books) == 0 {
+		resp := util.ResponseFail("theres no book found", nil)
+		return c.JSON(http.StatusOK, resp)
+	}
 	formatResponse := FormatResponseBooks(books)
-	response := util.ResponseSuccess("success", formatResponse)
+	response := util.ResponseSuccess("success get books", formatResponse)
 	return c.JSON(http.StatusOK, response)
 
 }
@@ -70,13 +74,18 @@ func (h *Controller) GetDetailsBook(c echo.Context) error {
 
 	books, err := h.bookModel.GetBookByID(uint(id))
 	if err != nil {
-		Response := util.ResponseError("error disini", nil)
+		Response := util.ResponseError("cann not get book", nil)
+		return c.JSON(http.StatusBadRequest, Response)
+	}
+
+	if books.ID == 0 {
+		Response := util.ResponseFail("there's no book found", nil)
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
 	responseFormat := FormatDetailsBook(books)
 
-	response := util.ResponseSuccess("success", responseFormat)
+	response := util.ResponseSuccess("success get details book", responseFormat)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -140,7 +149,7 @@ func (h *Controller) CreateNewPublisher(c echo.Context) error {
 	_ = middlewares.ExtractTokenUserId(c)
 	name := c.FormValue("name")
 	if name == "" {
-		response := util.ResponseError("please input author name", nil)
+		response := util.ResponseError("please input publisher name", nil)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 	name = strings.ToLower(name)
@@ -214,7 +223,7 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	}
 
-	response := util.ResponseSuccess("successfully create new publisher", author)
+	response := util.ResponseSuccess("successfully create new author", author)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -224,7 +233,7 @@ func (h *Controller) InsertBook(c echo.Context) error {
 	ya, err := h.bookModel.CheckBorrowBook(user_id)
 	if !ya || err != nil {
 		response := util.ResponseError("can not insert new book if you are still borrowing someone`s book", nil)
-		return c.JSON(http.StatusInternalServerError, response)
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 	var input models.InputBook
 
@@ -275,7 +284,8 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 	user_id := middlewares.ExtractTokenUserId(c)
 	bookID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return fmt.Errorf("error internal guys")
+		response := util.ResponseError("error internal", nil)
+		return c.JSON(http.StatusInternalServerError, response)
 	}
 
 	book, err := h.bookModel.GetBookByID(uint(bookID))
@@ -289,30 +299,28 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	err = c.Request().ParseMultipartForm(1024)
+	file, err := c.FormFile("file")
 	if err != nil {
-		response := util.ResponseError("failed to update photo of the book", nil)
+		fmt.Println("error nangkep file")
+		response := util.ResponseFail("error disni", err.Error())
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
-
-	foto, file, err := c.Request().FormFile("file")
+	src, err := file.Open()
 	if err != nil {
-		resp := util.ResponseError("internal error", nil)
-		return c.JSON(http.StatusInternalServerError, resp)
-
+		response := util.ResponseFail("internal error", err.Error())
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
+	defer src.Close()
 
-	defer foto.Close()
-
-	filebyte, err := ioutil.ReadAll(foto)
+	filebyte, err := ioutil.ReadAll(src)
 	if err != nil {
-		resp := util.ResponseError("internal error", nil)
+		resp := util.ResponseError("internal error", err.Error())
 		return c.JSON(http.StatusInternalServerError, resp)
 	}
 
 	mime := mimetype.Detect(filebyte)
 	if strings.Index(ExtensionAllowed, mime.Extension()) == -1 {
-		response := util.ResponseError("file type extension is not allowed", nil)
+		response := util.ResponseError("file type extension is not allowed", fmt.Sprintf("your extension %s", mime.Extension()))
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
@@ -349,4 +357,26 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 	response := util.ResponseSuccess("successfully update book photo", formatresponse)
 	return c.JSON(http.StatusOK, response)
 
+}
+
+func (h *Controller) GetCommentBookID(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response := util.ResponseError("error internal", err)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	commentBooks, err := h.bookModel.GetCommentBookID(id)
+	if err != nil {
+		rsponse := util.ResponseError("cant get comment", err)
+		return c.JSON(http.StatusUnprocessableEntity, rsponse)
+	}
+
+	if len(commentBooks) == 0 {
+		rsponse := util.ResponseSuccess("theres no any comment for this book yet", nil)
+		return c.JSON(http.StatusOK, rsponse)
+	}
+
+	response := util.ResponseSuccess("successfully get book comments", commentBooks)
+	return c.JSON(http.StatusOK, response)
 }

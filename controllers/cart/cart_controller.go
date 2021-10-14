@@ -83,6 +83,7 @@ func (controller *Controller) RentBook(c echo.Context) error {
 		BookDataID: uint(cartRequest.BookDataID),
 		DateLoan:   cartRequest.DateLoan,
 		DateDue:    cartRequest.DateDue,
+		DateReturn: cartRequest.DateReturn,
 	}
 
 	updatedCart, err := controller.cartModel.Rent(cart)

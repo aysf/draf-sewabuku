@@ -35,7 +35,7 @@ type Category struct {
 }
 
 type InputBook struct {
-	Title       string `json:"Title"`
+	Title       string `json:"title"`
 	CategoryID  uint   `json:"category_id"`
 	AuthorID    uint   `json:"author_id"`
 	PublisherID uint   `json:"publisher_id"`
@@ -43,4 +43,13 @@ type InputBook struct {
 	Price       uint16 `json:"price"`
 	Quantity    uint   `json:"quantity"`
 	Description string `jon:"description"`
+}
+
+type Testimoni struct {
+	BookID       uint
+	Title        string
+	UserID       uint
+	UserName     string
+	RateBook     float32
+	DescRateBook string
 }

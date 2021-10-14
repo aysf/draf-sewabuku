@@ -24,10 +24,10 @@ type (
 		UpdatePhoto(file string, book_id int) (models.BookData, error)
 		CheckAuthorName(name string) (bool, error)
 		CheckPublisherName(name string) (bool, error)
-		BorrowBook(cart models.Cart) (models.Cart, error)
 		InsertNewBook(input models.BookData) (models.BookData, error)
 		CheckBorrowBook(user_id int) (bool, error)
 		SearchBooks(keyword string, author, publisher, category int) ([]models.BookData, error)
+		GetCommentBookID(book_id int) ([]models.Testimoni, error)
 	}
 )
 
@@ -277,22 +277,17 @@ func (r *GormBookModel) CheckBorrowBook(user_id int) (bool, error) {
 	return true, nil
 }
 
-func (r *GormBookModel) BorrowBook(cart models.Cart) (models.Cart, error) {
+func (r *GormBookModel) GetCommentBookID(book_id int) ([]models.Testimoni, error) {
+	querry := `SELECT * FROM testimoni WHERE book_id = ?`
 
-	err := r.db.Create(&cart).Error
+	var testimonies []models.Testimoni
+	err := r.db.Raw(querry, book_id).Find(&testimonies).Error
 	if err != nil {
-		return cart, err
+		return testimonies, err
 	}
 
-	err = r.db.Model(&models.BookData{}).Where("id", cart.BookDataID).Update("quantity = ?", "quantity - 1").Error
-	if err != nil {
-		return cart, err
-	}
-
-	return cart, nil
-
+	return testimonies, nil
 }
-
 func NewBookModel(db *gorm.DB) *GormBookModel {
 	err := db.Exec(`CREATE OR REPLACE VIEW book_catalogs AS
 	SELECT 
@@ -332,6 +327,16 @@ func NewBookModel(db *gorm.DB) *GormBookModel {
 
 	if err1 != nil {
 		fmt.Println("masih errorrrrr disni")
+		panic(err)
+	}
+
+	err = db.Exec(`CREATE OR REPLACE  VIEW testimoni  AS SELECT c.book_data_id as book_id, bd.title as title ,c.user_id as user_id, u.name as user_name ,r.rate_book, r.desc_rate_book
+	FROM ratings r 
+	LEFT JOIN carts c  ON r.cart_id = c.id 
+	LEFT JOIN book_data bd ON c.book_data_id = bd.id 
+	LEFT JOIN users u ON c.user_id = u.id;`).Error
+
+	if err != nil {
 		panic(err)
 	}
 
