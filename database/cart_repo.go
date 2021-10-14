@@ -111,7 +111,8 @@ func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (interface{},
 
 	tx := g.db.Where("user_id = ? AND book_data_id = ?", userId, bookId).Last(&cart)
 	if tx.Error != nil {
-		return cart, tx.Error
+		msg := errors.New("input invalid")
+		return cart, msg
 	}
 	var nullTime time.Time
 	if cart.DateReturn != nullTime {
@@ -119,7 +120,8 @@ func (g *GormCartModel) Return(Date time.Time, userId, bookId int) (interface{},
 	}
 
 	if err := g.db.Model(&cart).Update("date_return", Date).Error; err != nil {
-		return cart, err
+		msg := errors.New("update failed")
+		return cart, msg
 	}
 
 	return cart, nil
