@@ -17,12 +17,42 @@ type (
 		Rent(cart models.Cart) (models.Cart, error)
 		GetBookByUserId(userId int) ([]models.BookData, error)
 		GetAccountByUserId(userId int) (models.Account, models.AccountHold, error)
-		GetBookByBookId(bookId int) (models.BookData, error)
+		GetLenderIdByBookId(bookId uint) (uint, error)
+		GetBookByBookId(bookId uint) (models.BookData, error)
+		UpdateSaldo(account models.Account, amount int) (interface{}, error)
 		Return(Date time.Time, userId, bookId int) (interface{}, error)
 		List(userId int) ([]models.Cart, error)
 		Extend(Date time.Time, userId, bookId int) (interface{}, error)
 	}
 )
+
+// get lender id
+func (g *GormCartModel) GetLenderIdByBookId(bookId uint) (uint, error) {
+	type Result struct {
+		UserID uint
+	}
+	var result Result
+
+	if err := g.db.Table("book_data").Select("user_id").Where("id = ?", bookId).Scan(&result).Error; err != nil {
+		return result.UserID, err
+	}
+	// if err := g.db.Raw("SELECT user_id FROM book_data WHERE id = ?", bookId).Scan(&user).Error; err != nil {
+	// 	return user.ID, err
+	// }
+
+	return result.UserID, nil
+}
+
+// UpdateSaldo
+func (g *GormCartModel) UpdateSaldo(account models.Account, amount int) (interface{}, error) {
+
+	updateBalance := account.Balance + uint(amount)
+
+	if err := g.db.Model(&account).Where("id = ?", account.ID).Update("balance", updateBalance).Error; err != nil {
+		return nil, err
+	}
+	return updateBalance, nil
+}
 
 // Rent is method to get book loan registration number
 func (g *GormCartModel) Rent(cart models.Cart) (models.Cart, error) {
@@ -58,7 +88,7 @@ func (g *GormCartModel) GetAccountByUserId(userId int) (models.Account, models.A
 	return account, accountHold, nil
 }
 
-func (g *GormCartModel) GetBookByBookId(bookId int) (models.BookData, error) {
+func (g *GormCartModel) GetBookByBookId(bookId uint) (models.BookData, error) {
 	var book models.BookData
 	if err := g.db.Model(&models.BookData{}).Where("id = ?", bookId).First(&book).Error; err != nil {
 		return book, err
