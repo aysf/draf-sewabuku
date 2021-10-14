@@ -152,25 +152,32 @@ paths:
         - Users
       description: Get Borrowed Book
       responses:
-      #   '200':
-      #     $ref: '#/components/responses/'
-      #   '400':
-      #     $ref: '#/components/responses/'
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
   /users/lent:
     get:
       tags:
         - Users
       description: Get Lent Book
       responses:
-      #   '200':
-      #     # $ref: '#/components/responses/'
-      #   '400':
-      #     # $ref: '#/components/responses/'
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
   /users/book-rating/{cart-id}:
     post:
       tags:
         - Users
       description: Input Book Rating
+      parameters:
+        - name: cart-id
+          description: The cart id
+          in: path
+          schema:
+            type: integer
+          required: true
       requestBody:
         content:
           application/json:
@@ -193,6 +200,13 @@ paths:
       tags:
         - Users
       description: Input Borrower Rating
+      parameters:
+        - name: cart-id
+          description: The cart id
+          in: path
+          schema:
+            type: integer
+          required: true
       requestBody:
         content:
           application/json:
@@ -299,32 +313,44 @@ paths:
       tags:
         - Carts
       description: Rent Book
-      ## requestbody
       responses:
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
 
   /carts/return:
     put:
       tags:
         - Carts
       description: Return Book
-      ## requestbody
       responses:
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
 
   /carts/extend:
     put:
       tags:
         - Carts
       description: Extend Rent Book
-      ## requestbody
       responses:
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
 
   /carts:
     post:
       tags:
         - Carts
       description: Get List Book on Cart
-      ## requestbody
       responses:
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
 
   #
   ####################################
@@ -347,9 +373,11 @@ paths:
       tags:
         - Accounts
       description: topup withdraw
-      #requestBody:
-
       responses:
+        '200':
+          $ref: '#/components/responses/operationSuccess'
+        '400':
+          $ref: '#/components/responses/operationFailed'
 
 components:
   responses:
@@ -971,3 +999,32 @@ components:
               message:
                 type: string
                 example: Fail to Create Transaction
+    #==================================#
+    #    DEFAULT RESPONSE
+    #==================================#
+    operationSuccess:
+      description: operation success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Operation Success
+    operationFailed:
+      description: operation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Operation Failed
