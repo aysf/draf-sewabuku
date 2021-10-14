@@ -9,6 +9,8 @@ add `.env` file in the root repository, for example:
 ```sh
 DB_USERNAME=username
 DB_PASSWORD=pasword
+DB_HOST=host
+DB_PORT=port
 DB_NAME=sewabuku
 DB_NAME_TEST=dbtest
 SECRET_KEY=secret123
