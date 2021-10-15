@@ -72,11 +72,11 @@ func (h *Controller) GetDetailsBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response)
 	}
 
-	books, err := h.bookModel.GetBookByID(uint(id))
-	if err != nil {
-		Response := util.ResponseError("cann not get book", nil)
-		return c.JSON(http.StatusBadRequest, Response)
-	}
+	books, _ := h.bookModel.GetBookByID(uint(id))
+	// if err != nil {
+	// 	Response := util.ResponseError("cann not get book", nil)
+	// 	return c.JSON(http.StatusBadRequest, Response)
+	// }
 
 	if books.ID == 0 {
 		Response := util.ResponseFail("there's no book found", nil)
@@ -203,11 +203,11 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	}
 
-	check, err := h.bookModel.CheckAuthorName(name)
-	if err != nil {
-		response := util.ResponseError("failed error", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+	check, _ := h.bookModel.CheckAuthorName(name)
+	// if err != nil {
+	// 	response := util.ResponseError("failed error", nil)
+	// 	return c.JSON(http.StatusUnprocessableEntity, response)
+	// }
 
 	if !check {
 		response := util.ResponseFail("cannot input name author with same name which already exist", nil)
@@ -216,12 +216,12 @@ func (h *Controller) CreateNewAuthor(c echo.Context) error {
 
 	var input models.Author
 	input.Name = name
-	author, err := h.bookModel.CreateNewAuthor(input)
-	if err != nil {
-		response := util.ResponseError("error", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
+	author, _ := h.bookModel.CreateNewAuthor(input)
+	// if err != nil {
+	// 	response := util.ResponseError("error", nil)
+	// 	return c.JSON(http.StatusUnprocessableEntity, response)
 
-	}
+	// }
 
 	response := util.ResponseSuccess("successfully create new author", author)
 	return c.JSON(http.StatusOK, response)
