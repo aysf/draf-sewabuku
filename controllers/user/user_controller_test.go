@@ -231,6 +231,7 @@ func TestController_GetUserProfileController(t *testing.T) {
 
 			var response userResponse
 			json.Unmarshal([]byte(resBody), &response)
+			fmt.Println(res)
 
 			assert.Equal(t, testCase.expectCode, res.Code)
 			assert.Equal(t, testCase.responseStatus, response.Status)

@@ -13,6 +13,7 @@ import (
 	"sewabuku/config"
 	"sewabuku/database"
 	"sewabuku/middlewares"
+	"sewabuku/models"
 	"strings"
 	"testing"
 
@@ -81,46 +82,6 @@ func TestFilterring(t *testing.T) {
 		// fmt.Println(response, "kok kosong")
 		// fmt.Println(res)
 		if assert.NoError(t, bookHandler.FilterAuthorCategoryPublisher(c)) {
-
-			assert.Equal(t, testCase.expectCode, res.Code)
-			assert.Equal(t, testCase.expectMsg, response.Message)
-		}
-
-	}
-
-}
-
-func TestGetALL(t *testing.T) {
-	testCases := []struct {
-		testName int
-
-		expectCode int
-		expectMsg  string
-	}{
-		{
-			testName:   1,
-			expectCode: http.StatusOK,
-			expectMsg:  "success get all books",
-		}, {
-			testName:   2,
-			expectCode: http.StatusOK,
-			expectMsg:  "success get all books",
-		},
-	}
-
-	for _, testCase := range testCases {
-		req := httptest.NewRequest(http.MethodGet, "/all", nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		res := httptest.NewRecorder()
-		c := e.NewContext(req, res)
-		err := bookHandler.GetAllBooks(c)
-		assert.NoError(t, err)
-
-		resBody := res.Body.Bytes()
-		var response bookResponse
-		json.Unmarshal(resBody, &response)
-
-		if assert.NoError(t, bookHandler.GetAllBooks(c)) {
 
 			assert.Equal(t, testCase.expectCode, res.Code)
 			assert.Equal(t, testCase.expectMsg, response.Message)
@@ -251,116 +212,6 @@ func TestGetDetailsBook(t *testing.T) {
 
 	}
 }
-
-func TestGetPublisher(t *testing.T) {
-
-	testCases := []struct {
-		name         string
-		expectedCode int
-		ExpectMsg    string
-	}{
-		{
-			name:         "test1",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		}, {
-			name:         "test2",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		},
-	}
-
-	for _, testCase := range testCases {
-		req := httptest.NewRequest(http.MethodGet, "/books/listpublisher", nil)
-		res := httptest.NewRecorder()
-		c := e.NewContext(req, res)
-		err := bookHandler.GetListPublisher(c)
-		assert.NoError(t, err)
-		if assert.NoError(t, bookHandler.GetListPublisher(c)) {
-			assert.Equal(t, testCase.expectedCode, res.Code)
-		}
-
-	}
-}
-
-func TestGetAuthor(t *testing.T) {
-
-	testCases := []struct {
-		name         string
-		expectedCode int
-		ExpectMsg    string
-	}{
-		{
-			name:         "test1",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		}, {
-			name:         "test2",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		},
-	}
-
-	for _, testCase := range testCases {
-		req := httptest.NewRequest(http.MethodGet, "/books/listauthor", nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
-		res := httptest.NewRecorder()
-		c := e.NewContext(req, res)
-		err := bookHandler.GetListAuthor(c)
-		assert.NoError(t, err)
-
-		fmt.Println(res)
-		resBOdy := res.Body.Bytes()
-		var response bookResponse
-		err = json.Unmarshal(resBOdy, &response)
-		assert.NoError(t, err)
-
-		if assert.NoError(t, bookHandler.GetListAuthor(c)) {
-			assert.Equal(t, testCase.expectedCode, res.Code)
-			assert.Equal(t, testCase.ExpectMsg, response.Message)
-		}
-
-	}
-}
-
-func TestGetCategory(t *testing.T) {
-
-	testCases := []struct {
-		name         string
-		expectedCode int
-		ExpectMsg    string
-	}{
-		{
-			name:         "test1",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		}, {
-			name:         "test2",
-			expectedCode: 200,
-			ExpectMsg:    "success",
-		},
-	}
-
-	for _, testCase := range testCases {
-		req := httptest.NewRequest(http.MethodGet, "/books/listcategory", nil)
-		res := httptest.NewRecorder()
-		c := e.NewContext(req, res)
-		err := bookHandler.GetListCategory(c)
-		assert.NoError(t, err)
-
-		var response bookResponse
-		resBody := res.Body.Bytes()
-		err = json.Unmarshal(resBody, &response)
-
-		assert.NoError(t, err)
-		if assert.NoError(t, bookHandler.GetListCategory(c)) {
-			assert.Equal(t, testCase.expectedCode, res.Code)
-			assert.Equal(t, testCase.ExpectMsg, response.Message)
-		}
-
-	}
-}
-
 func TestInsertBook(t *testing.T) {
 
 	token1, _ := middlewares.CreateToken(2)
@@ -579,8 +430,15 @@ func TestUpdatePhotoBook(t *testing.T) {
 			nameTest:     "test2",
 			token:        token2,
 			bookid:       "1",
-			ReqFile:      "/home/rjandoni/Downloads/bwa-storegg-server.png",
+			ReqFile:      "../../../../Downloads/2.png",
 			expectdMsg:   "you are not owner of this book",
+			expectedCode: 422,
+		}, {
+			nameTest:     "test2",
+			token:        token2,
+			bookid:       "9",
+			ReqFile:      "../../../../Downloads/2.png",
+			expectdMsg:   "failed to update book's photo",
 			expectedCode: 422,
 		},
 	}
@@ -601,7 +459,7 @@ func TestUpdatePhotoBook(t *testing.T) {
 
 		f := url.Values{}
 		f.Set("file", test.ReqFile)
-		req := httptest.NewRequest(http.MethodPut, "/books/bookphoto", strings.NewReader(f.Encode()))
+		req := httptest.NewRequest(http.MethodPut, "/books/bookphoto/", strings.NewReader(f.Encode()))
 		req.Header.Add("Content-Type", "multipart/form-data")
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Add(echo.HeaderContentType, writer.FormDataContentType())
@@ -675,5 +533,182 @@ func TestGetComment(t *testing.T) {
 			assert.Equal(t, testcase.expectedCode, res.Code)
 			assert.Equal(t, testcase.expectedMsg, response.Message)
 		}
+	}
+}
+
+func TestGetALL(t *testing.T) {
+	testCases := []struct {
+		testName int
+
+		expectCode int
+		expectMsg  string
+	}{
+		{
+			testName:   1,
+			expectCode: http.StatusOK,
+			expectMsg:  "success get all books",
+		}, {
+			testName:   2,
+			expectCode: http.StatusOK,
+			expectMsg:  "success get all books",
+		}, {
+			testName:   3,
+			expectCode: http.StatusBadRequest,
+			expectMsg:  "failed error",
+		},
+	}
+
+	for _, testCase := range testCases {
+		if testCase.testName == 3 {
+			db.Migrator().DropTable(&models.BookData{})
+		}
+		req := httptest.NewRequest(http.MethodGet, "/all", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		c := e.NewContext(req, res)
+		err := bookHandler.GetAllBooks(c)
+		assert.NoError(t, err)
+
+		resBody := res.Body.Bytes()
+		var response bookResponse
+		json.Unmarshal(resBody, &response)
+
+		if assert.NoError(t, bookHandler.GetAllBooks(c)) {
+
+			assert.Equal(t, testCase.expectCode, res.Code)
+			assert.Equal(t, testCase.expectMsg, response.Message)
+		}
+
+	}
+
+}
+
+func TestGetPublisher(t *testing.T) {
+
+	testCases := []struct {
+		name         string
+		expectedCode int
+		ExpectMsg    string
+	}{
+		{
+			name:         "test1",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test2",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test3",
+			expectedCode: 422,
+			ExpectMsg:    "Error 1146: Table 'bukusampingan.publishers' doesn't exist",
+		},
+	}
+
+	for _, testCase := range testCases {
+		if testCase.name == "test3" {
+			db.Migrator().DropTable(&models.Publisher{})
+		}
+		req := httptest.NewRequest(http.MethodGet, "/books/listpublisher", nil)
+		res := httptest.NewRecorder()
+		c := e.NewContext(req, res)
+		err := bookHandler.GetListPublisher(c)
+		assert.NoError(t, err)
+		if assert.NoError(t, bookHandler.GetListPublisher(c)) {
+			assert.Equal(t, testCase.expectedCode, res.Code)
+		}
+
+	}
+}
+
+func TestGetAuthor(t *testing.T) {
+
+	testCases := []struct {
+		name         string
+		expectedCode int
+		ExpectMsg    string
+	}{
+		{
+			name:         "test1",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test2",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test3",
+			expectedCode: 422,
+			ExpectMsg:    "Error 1146: Table 'bukusampingan.authors' doesn't exist",
+		},
+	}
+
+	for _, testCase := range testCases {
+		if testCase.name == "test3" {
+			db.Migrator().DropTable(&models.Author{})
+		}
+		req := httptest.NewRequest(http.MethodGet, "/books/listauthor", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		res := httptest.NewRecorder()
+		c := e.NewContext(req, res)
+		err := bookHandler.GetListAuthor(c)
+		assert.NoError(t, err)
+
+		fmt.Println(res)
+		resBOdy := res.Body.Bytes()
+		var response bookResponse
+		err = json.Unmarshal(resBOdy, &response)
+		assert.NoError(t, err)
+
+		if assert.NoError(t, bookHandler.GetListAuthor(c)) {
+			assert.Equal(t, testCase.expectedCode, res.Code)
+			assert.Equal(t, testCase.ExpectMsg, response.Message)
+		}
+
+	}
+}
+
+func TestGetCategory(t *testing.T) {
+
+	testCases := []struct {
+		name         string
+		expectedCode int
+		ExpectMsg    string
+	}{
+		{
+			name:         "test1",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test2",
+			expectedCode: 200,
+			ExpectMsg:    "success",
+		}, {
+			name:         "test3",
+			expectedCode: 422,
+			ExpectMsg:    "Error 1146: Table 'bukusampingan.categories' doesn't exist",
+		},
+	}
+
+	for _, testCase := range testCases {
+		if testCase.name == "test3" {
+			db.Migrator().DropTable(&models.Category{})
+		}
+		req := httptest.NewRequest(http.MethodGet, "/books/listcategory", nil)
+		res := httptest.NewRecorder()
+		c := e.NewContext(req, res)
+		err := bookHandler.GetListCategory(c)
+		assert.NoError(t, err)
+
+		var response bookResponse
+		resBody := res.Body.Bytes()
+		err = json.Unmarshal(resBody, &response)
+
+		assert.NoError(t, err)
+		if assert.NoError(t, bookHandler.GetListCategory(c)) {
+			assert.Equal(t, testCase.expectedCode, res.Code)
+			assert.Equal(t, testCase.ExpectMsg, response.Message)
+		}
+
 	}
 }
