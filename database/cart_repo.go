@@ -77,13 +77,23 @@ func (g *GormCartModel) GetAccountByUserId(userId int) (models.Account, models.A
 	var account models.Account
 	var accountHold models.AccountHold
 
-	if err := g.db.Model(&models.Account{}).Where("user_id = ?", userId).Find(&account).Error; err != nil {
+	err := g.db.Raw("SELECT * FROM accounts WHERE user_id = ?", userId).Find(&account).Error
+	if err != nil {
 		return account, accountHold, err
 	}
 
-	if err := g.db.Model(&models.AccountHold{}).Where("account_id = ?", account.ID).Find(&accountHold).Error; err != nil {
+	// if err := g.db.Model(&models.Account{}).Where("user_id = ?", userId).Find(&account).Error; err != nil {
+	// 	return account, accountHold, err
+	// }
+
+	err = g.db.Raw(`SELECT * FROM account_holds WHERE account_id = ?`, account.ID).Find(&accountHold).Error
+	if err != nil {
 		return account, accountHold, err
 	}
+
+	// if err := g.db.Model(&models.AccountHold{}).Where("account_id = ?", account.ID).Find(&accountHold).Error; err != nil {
+	// 	return account, accountHold, err
+	// }
 
 	return account, accountHold, nil
 }
