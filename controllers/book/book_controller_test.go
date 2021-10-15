@@ -461,7 +461,6 @@ func TestUpdatePhotoBook(t *testing.T) {
 		f.Set("file", test.ReqFile)
 		req := httptest.NewRequest(http.MethodPut, "/books/bookphoto/", strings.NewReader(f.Encode()))
 		req.Header.Add("Content-Type", "multipart/form-data")
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Add(echo.HeaderContentType, writer.FormDataContentType())
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", test.token))
 
