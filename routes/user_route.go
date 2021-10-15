@@ -30,7 +30,7 @@ func UserPath(e *echo.Echo, userController *user.Controller) {
 
 	jwtAuth.GET("/books", userController.GetLentController)
 
-	jwtAuth.PUT("/book-rating/:id/", userController.InsertRatingBookController)
+	jwtAuth.PUT("/book-rating/:id", userController.InsertRatingBookController)
 
-	jwtAuth.PUT("/borrower-rating/:id/", userController.InsertRatingBorrowerController)
+	jwtAuth.PUT("/borrower-rating/:id", userController.InsertRatingBorrowerController)
 }

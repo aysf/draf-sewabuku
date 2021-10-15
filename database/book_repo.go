@@ -118,7 +118,7 @@ func (r *GormBookModel) GetBookByID(id uint) (models.BookData, error) {
 		return book, err
 	}
 
-	querry2 := `SELECT AVG(rate_book) rate FROM rating r WHERE book_data_id = ?`
+	querry2 := `SELECT AVG(rate_book) rate FROM rating WHERE book_data_id = ?`
 	var rate float32
 	err = r.db.Raw(querry2, id).Find(&rate).Error
 	if err != nil {
@@ -334,7 +334,7 @@ func NewBookModel(db *gorm.DB) *GormBookModel {
 	FROM ratings r 
 	LEFT JOIN carts c  ON r.cart_id = c.id 
 	LEFT JOIN book_data bd ON c.book_data_id = bd.id 
-	LEFT JOIN users u ON c.user_id = u.id;`).Error
+	LEFT JOIN users u ON c.user_id = u.id`).Error
 
 	if err != nil {
 		panic(err)
