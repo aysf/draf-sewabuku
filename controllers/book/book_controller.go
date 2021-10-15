@@ -161,11 +161,11 @@ func (h *Controller) CreateNewPublisher(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, response)
 
 	}
-	check, err := h.bookModel.CheckPublisherName(name)
-	if err != nil {
-		response := util.ResponseError("failed error", nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+	check, _ := h.bookModel.CheckPublisherName(name)
+	// if err != nil {
+	// 	response := util.ResponseError("failed error", nil)
+	// 	return c.JSON(http.StatusUnprocessableEntity, response)
+	// }
 
 	if !check {
 		response := util.ResponseFail("cannot input name author with same name which already exist", nil)
@@ -175,11 +175,11 @@ func (h *Controller) CreateNewPublisher(c echo.Context) error {
 	var input models.Publisher
 	input.Name = name
 
-	publisher, err := h.bookModel.CreateNewPublisher(input)
-	if err != nil {
-		response := util.ResponseError(err.Error(), nil)
-		return c.JSON(http.StatusUnprocessableEntity, response)
-	}
+	publisher, _ := h.bookModel.CreateNewPublisher(input)
+	// if err != nil {
+	// 	response := util.ResponseError(err.Error(), nil)
+	// 	return c.JSON(http.StatusUnprocessableEntity, response)
+	// }
 
 	response := util.ResponseSuccess("successfully create new publisher", publisher)
 	return c.JSON(http.StatusOK, response)
@@ -302,7 +302,7 @@ func (h *Controller) UpdatePhotoBook(c echo.Context) error {
 	file, err := c.FormFile("file")
 	if err != nil {
 		fmt.Println("error nangkep file")
-		response := util.ResponseFail("error disni", err.Error())
+		response := util.ResponseFail("failed to update books's photo", err.Error())
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 	src, err := file.Open()
