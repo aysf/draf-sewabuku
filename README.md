@@ -23,6 +23,6 @@ run the program `go run main.go`
 
 ## Project Presentation
 
-## [Google Sheet](https://docs.google.com/presentation/d/1T5C-ivaGnY6lm3_8jh_ihfltFYoYovYeTcq2TKSmqGs/edit?usp=sharing)
+[Google Sheet](https://docs.google.com/presentation/d/1T5C-ivaGnY6lm3_8jh_ihfltFYoYovYeTcq2TKSmqGs/edit?usp=sharing)
 
 
