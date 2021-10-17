@@ -20,3 +20,9 @@ BCRYPT_COST=14
 download some packages in `go.mod` using command `go get url/to/package`
 
 run the program `go run main.go`
+
+## Project Presentation
+
+## [Google Sheet](https://docs.google.com/presentation/d/1T5C-ivaGnY6lm3_8jh_ihfltFYoYovYeTcq2TKSmqGs/edit?usp=sharing)
+
+
